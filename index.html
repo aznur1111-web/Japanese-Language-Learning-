@@ -1,0 +1,1806 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#171512">
+<meta name="description" content="A self-contained JLPT N5–N4 Japanese learning lab with vocabulary, grammar, SRS flashcards, mnemonics, and interactive practice.">
+<title>Japanese Lab — JLPT N5 → N4 Japanese Learning Lab</title>
+<style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+--bg:#171512;--panel:#211e1a;--panel2:#2b2620;--panel3:#1b1916;--line:#3a332b;--line2:#51463a;
+--text:#f4efe8;--muted:#c0b6a8;--subtle:#958879;--accent:#e87935;--accent2:#ff9b54;--blue:#91b9f5;
+--green:#7dd8a8;--yellow:#f0d080;--red:#ff9a9a;--purple:#c4a8f0;--shadow:0 12px 32px rgba(0,0,0,.18);--radius:12px}
+body[data-theme="light"]{color-scheme:light;--bg:#faf7f2;--panel:#ffffff;--panel2:#fff0e4;--panel3:#fcf8f2;--line:#eadfd2;--line2:#d9c4af;--text:#29231d;--muted:#6e6256;--subtle:#8b7d6f;--accent:#c85b20;--accent2:#a94716;--blue:#3060a8;--green:#20744d;--yellow:#946512;--red:#b83c36;--purple:#7552a3;--shadow:0 6px 20px rgba(75,48,25,.06)}
+button,input,textarea,select{font:inherit}
+::selection{background:var(--accent);color:#fff}
+button,.card,.stat,.vocab-card,.grammar-card,.path-card,.navtab,.side-item,.btn,.filter-btn{transition:background-color .16s ease,border-color .16s ease,color .16s ease,box-shadow .16s ease}
+body{min-height:100vh}
+.card:hover{border-color:color-mix(in srgb,var(--line) 70%,var(--accent))}
+.btn.primary{box-shadow:0 2px 8px rgba(200,91,32,.16)}
+:focus-visible{scroll-margin:16px}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* ---------- Topbar ---------- */
+.topbar{min-height:62px;display:flex;align-items:center;gap:18px;padding:10px 20px;border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:10;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;min-width:200px}
+.brand-mark{width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--line2);background:var(--panel2);color:var(--accent);border-radius:10px;font-weight:850;font-size:14px}
+.brand strong{display:block;font-size:14px;letter-spacing:-.01em}
+.brand small{display:block;font-size:9px;letter-spacing:.14em;color:var(--muted);margin-top:1px}
+.top-meta{display:flex;align-items:center;gap:8px;flex:1;min-width:0;color:var(--muted);font-size:11px}
+.top-chip{border:1px solid var(--line);padding:4px 8px;border-radius:6px;white-space:nowrap}
+.top-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.btn{display:inline-flex;justify-content:center;align-items:center;gap:6px;border:1px solid var(--line2);background:var(--panel2);color:var(--text);border-radius:8px;padding:7px 11px;font-size:11px;font-weight:650;white-space:nowrap}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:linear-gradient(135deg,#e87935,#c85b20);border-color:#f09a60;color:#fff}
+.btn.primary:hover{background:linear-gradient(135deg,#d96625,#a94716)}
+.btn.green{background:linear-gradient(135deg,#208060,#186850);border-color:#40a080;color:#fff}
+.btn.small{padding:4px 8px;font-size:10px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.ghost{background:transparent}
+
+/* ---------- Tabs ---------- */
+.navtabs{display:flex;gap:2px;padding:0 20px;overflow-x:auto;border-bottom:1px solid var(--line);background:var(--panel)}
+.navtab{padding:10px 16px;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;color:var(--muted);white-space:nowrap;font-size:12px;font-weight:700;cursor:pointer}
+.navtab:hover{color:var(--text)}
+.navtab.active{border-bottom-color:var(--accent);color:var(--accent);background:linear-gradient(0deg,rgba(232,121,53,.09),transparent)}
+
+/* ---------- Layout ---------- */
+.layout{max-width:1500px;margin:0 auto;padding:16px;display:grid;grid-template-columns:240px minmax(0,1fr);gap:14px;align-items:start}
+.sidebar{position:sticky;top:74px;max-height:calc(100vh - 86px);overflow:auto;padding:12px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius)}
+.sidebar::-webkit-scrollbar{width:7px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--line2);border-radius:7px}
+.main{min-width:0}
+
+/* ---------- Views ---------- */
+.view{display:none}
+.view.active{display:block;animation:fade .18s ease}
+@keyframes fade{from{opacity:.7;transform:translateY(2px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- Cards / panels ---------- */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin-bottom:14px;box-shadow:var(--shadow);min-width:0}
+.card h2,.card h3{margin:0 0 10px}
+.card h2{font-size:17px;letter-spacing:-.02em}
+.card h3{font-size:13px;font-weight:750}
+.eyebrow{font-size:9px;font-weight:800;letter-spacing:.16em;color:var(--subtle);text-transform:uppercase;margin-bottom:6px}
+.lead{max-width:820px;color:var(--muted);font-size:13px;margin:0 0 16px}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+.tiny{font-size:10px;color:var(--subtle)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+
+/* ---------- Stats ---------- */
+.stat{position:relative;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:14px 16px;overflow:hidden}
+.stat:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+.stat .k{font-size:9px;font-weight:800;letter-spacing:.1em;color:var(--subtle);text-transform:uppercase}
+.stat .v{font-size:24px;font-weight:800;margin:4px 0 2px;letter-spacing:-.02em}
+.stat .d{font-size:11px;color:var(--muted)}
+
+/* ---------- Progress ---------- */
+.progress-track{height:6px;background:var(--panel3);border-radius:99px;overflow:hidden;margin:8px 0}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--purple));border-radius:99px;transition:width .3s}
+
+/* ---------- Vocabulary card ---------- */
+.vocab-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:10px;cursor:pointer;position:relative}
+.vocab-card:hover{border-color:var(--accent)}
+.vocab-card .jp{font-size:20px;font-weight:750;letter-spacing:.02em}
+.vocab-card .kana{font-size:13px;color:var(--accent);margin-top:2px}
+.vocab-card .en{font-size:13px;color:var(--muted);margin-top:4px}
+.vocab-card .level-tag{position:absolute;top:10px;right:12px;font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;letter-spacing:.06em}
+.level-n5{background:rgba(125,216,168,.15);color:var(--green);border:1px solid rgba(125,216,168,.3)}
+.level-n4{background:rgba(132,184,255,.15);color:var(--blue);border:1px solid rgba(132,184,255,.3)}
+.vocab-card .mnemonic{font-size:11px;color:var(--purple);margin-top:6px;padding:6px 8px;background:rgba(196,168,240,.08);border-radius:6px;border-left:2px solid var(--purple);display:none}
+.vocab-card.expanded .mnemonic{display:block}
+.vocab-card .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+
+/* ---------- Grammar card ---------- */
+.grammar-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:10px}
+.grammar-card .pattern{font-size:17px;font-weight:750;color:var(--accent2)}
+.grammar-card .meaning{font-size:13px;color:var(--text);margin:6px 0}
+.grammar-card .structure{font-size:11px;color:var(--subtle);font-family:ui-monospace,monospace;background:var(--panel3);padding:6px 8px;border-radius:6px;margin:6px 0}
+.grammar-card .example-jp{font-size:14px;margin:6px 0 2px}
+.grammar-card .example-en{font-size:12px;color:var(--muted);font-style:italic}
+.grammar-card .mnemonic{font-size:11px;color:var(--purple);margin-top:6px;padding:6px 8px;background:rgba(196,168,240,.08);border-radius:6px;border-left:2px solid var(--purple);display:none}
+.grammar-card.expanded .mnemonic{display:block}
+.grammar-card .level-tag{display:inline-block;font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;letter-spacing:.06em;margin-left:8px;vertical-align:middle}
+
+/* ---------- Flashcard ---------- */
+.flashcard-area{perspective:1200px;max-width:560px;margin:0 auto}
+.flashcard{position:relative;width:100%;min-height:300px;transform-style:preserve-3d;transition:transform .5s ease}
+.flashcard.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--panel);border:1px solid var(--line);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 24px;text-align:center;box-shadow:var(--shadow)}
+.fc-back{transform:rotateY(180deg)}
+.fc-front .word{font-size:36px;font-weight:800;letter-spacing:.02em}
+.fc-front .hint{font-size:12px;color:var(--subtle);margin-top:14px}
+.fc-back .word{font-size:24px;font-weight:750}
+.fc-back .kana{font-size:14px;color:var(--accent);margin-top:4px}
+.fc-back .meaning{font-size:18px;margin-top:12px;font-weight:600}
+.fc-back .mnemonic{font-size:12px;color:var(--purple);margin-top:14px;padding:10px 12px;background:rgba(196,168,240,.08);border-radius:8px;border-left:2px solid var(--purple);max-width:90%}
+
+/* ---------- Quiz ---------- */
+.quiz-option{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:8px;margin:6px 0;padding:11px 14px;font-size:13px;font-weight:500;cursor:pointer;white-space:normal}
+.quiz-option:hover{border-color:var(--accent);background:var(--panel2)}
+.quiz-option.correct{border-color:var(--green);background:rgba(125,216,168,.1);color:var(--green)}
+.quiz-option.wrong{border-color:var(--red);background:rgba(255,154,154,.1);color:var(--red)}
+.quiz-option:disabled{cursor:default;opacity:.7}
+.quiz-feedback{display:none;padding:12px 14px;background:var(--panel3);border-radius:8px;margin-top:10px;font-size:12px;line-height:1.7;border-left:3px solid var(--accent)}
+.quiz-feedback.show{display:block}
+.quiz-feedback .jp{font-size:15px;font-weight:650;margin:6px 0 2px}
+.quiz-feedback .en{font-size:12px;color:var(--muted)}
+
+/* ---------- Buttons row ---------- */
+.btn-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+
+/* ---------- Chip / tag ---------- */
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;background:var(--panel3);border:1px solid var(--line);color:var(--muted)}
+.chip.accent{border-color:var(--accent);color:var(--accent)}
+
+/* ---------- Search ---------- */
+.search-box{width:100%;padding:10px 12px;border:1px solid var(--line2);border-radius:8px;background:var(--panel3);color:var(--text);outline:none;font-size:13px}
+.search-box:focus{border-color:var(--accent)}
+
+/* ---------- Filter row ---------- */
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.filter-btn{padding:5px 10px;border-radius:6px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:11px;font-weight:650;cursor:pointer}
+.filter-btn.active{background:var(--panel2);border-color:var(--accent);color:var(--accent2)}
+
+/* ---------- Sidebar nav ---------- */
+.side-title{font-size:9px;font-weight:800;letter-spacing:.14em;color:var(--subtle);text-transform:uppercase;margin:12px 6px 6px}
+.side-item{display:block;width:100%;text-align:left;padding:8px 10px;border-radius:7px;border:0;background:transparent;color:var(--muted);font-size:12px;font-weight:550;cursor:pointer;margin-bottom:1px}
+.side-item:hover{background:var(--panel2);color:var(--text)}
+.side-item.active{background:var(--panel2);color:var(--accent);font-weight:700}
+
+/* ---------- Misc ---------- */
+.empty{padding:28px 16px;text-align:center;color:var(--muted);font-size:12px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);padding:9px 16px;background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:9px;font-size:12px;z-index:50;display:none;box-shadow:var(--shadow);max-width:90vw}
+.toast.show{display:block}
+.pill-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+kbd{font:10px/1 ui-monospace,monospace;border:1px solid var(--line2);border-bottom-width:2px;border-radius:4px;padding:2px 5px;background:var(--panel2);color:var(--text)}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.section-head h2{margin:0}
+
+/* ---------- Learning path ---------- */
+.path-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.path-card{border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--panel);cursor:pointer}
+.path-card:hover{border-color:var(--accent)}
+.path-card h3{font-size:14px;margin:0 0 6px}
+.path-card p{font-size:12px;color:var(--muted);margin:0 0 8px}
+
+/* ---------- Mobile ---------- */
+.mobile-menu{display:none}
+@media(max-width:900px){
+ .layout{grid-template-columns:1fr}
+ .sidebar{position:static;max-height:none;display:none}
+ .sidebar.open{display:block}
+ .mobile-menu{display:inline-flex}
+ .grid-3,.grid-4{grid-template-columns:repeat(2,1fr)}
+ .path-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+ .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+ .topbar{padding:9px 12px;gap:10px}
+ .brand small{display:none}
+ .top-meta{display:none}
+ .fc-front .word{font-size:28px}
+}
+
+/* ---------- Print ---------- */
+@media print{
+ .topbar,.navtabs,.sidebar,.top-actions,.mobile-menu,.toast,.btn-row,.filter-row{display:none!important}
+ .layout{display:block;padding:0}
+ .card{box-shadow:none;border:1px solid #ccc;break-inside:avoid}
+}
+</style>
+</head>
+<body data-theme="dark">
+
+<!-- ================= TOPBAR ================= -->
+<header class="topbar">
+ <div class="brand">
+  <div class="brand-mark" aria-hidden="true">桜</div>
+  <div><strong>Japanese Lab</strong><small>JLPT N5 → N4 · JAPANESE LEARNING LAB</small></div>
+ </div>
+ <div class="top-meta">
+  <span class="top-chip">N5 + N4</span>
+  <span class="top-chip" id="vocabCount">— words</span>
+  <span class="top-chip" id="grammarCount">— grammar</span>
+  <span id="saveState">Saved locally</span>
+ </div>
+ <div class="top-actions">
+  <button type="button" class="btn small mobile-menu" id="mobileMenu" aria-expanded="false" aria-controls="sidebar">☰ Menu</button>
+  <button type="button" class="btn small" id="themeBtn" aria-pressed="false">Light</button>
+  <button type="button" class="btn small" id="printBtn">Print</button>
+  <button type="button" class="btn small" id="exportBtn">Export</button>
+  <button type="button" class="btn small" id="importBtn">Import</button>
+  <input type="file" id="importFile" accept=".json,application/json" hidden>
+ </div>
+</header>
+
+<!-- ================= TABS ================= -->
+<nav class="navtabs" aria-label="Main sections">
+ <button type="button" class="navtab active" data-view="dashboard">Dashboard</button>
+ <button type="button" class="navtab" data-view="vocab">Vocabulary</button>
+ <button type="button" class="navtab" data-view="grammar">Grammar</button>
+ <button type="button" class="navtab" data-view="practice">Practice</button>
+ <button type="button" class="navtab" data-view="flashcards">Flashcards</button>
+ <button type="button" class="navtab" data-view="mnemonics">Memory Lab</button>
+</nav>
+
+<!-- ================= LAYOUT ================= -->
+<div class="layout">
+
+<!-- ================= SIDEBAR ================= -->
+<aside class="sidebar" id="sidebar" aria-label="Navigation">
+ <div class="side-title">JLPT Level</div>
+ <button type="button" class="side-item active" data-level="all">All levels</button>
+ <button type="button" class="side-item" data-level="n5">JLPT N5</button>
+ <button type="button" class="side-item" data-level="n4">JLPT N4</button>
+ <div class="side-title" id="sideTopicTitle">Topics</div>
+ <div id="sideTopics"></div>
+ <div class="side-title">Study Tools</div>
+ <button type="button" class="side-item" data-goto="flashcards">SRS Flashcards</button>
+ <button type="button" class="side-item" data-goto="practice">Quiz / Test</button>
+ <button type="button" class="side-item" data-goto="mnemonics">Memory Techniques</button>
+ <div class="tiny" style="margin:14px 6px;line-height:1.7">
+  <kbd>/</kbd> search &nbsp; <kbd>Esc</kbd> clear<br>
+  Progress saved in this browser.<br>
+  Export a backup anytime.
+ </div>
+</aside>
+
+<!-- ================= MAIN ================= -->
+<main class="main">
+
+<!-- ====== DASHBOARD ====== -->
+<section class="view active" id="view-dashboard">
+ <div class="eyebrow">Your Japanese journey</div>
+ <h1 style="font-size:clamp(22px,3vw,30px);letter-spacing:-.03em;margin:0 0 6px">Welcome to Japanese Lab</h1>
+ <p class="lead">A complete, self-contained Japanese learning environment for JLPT N5 and N4. Every vocabulary word, every grammar pattern, with English translations, mnemonics, spaced-repetition flashcards, and interactive quizzes.</p>
+
+ <div class="grid-4" style="margin-bottom:14px">
+  <div class="stat"><div class="k">Vocabulary</div><div class="v" id="dashVocab">—</div><div class="d">N5 + N4 words</div></div>
+  <div class="stat"><div class="k">Grammar</div><div class="v" id="dashGrammar">—</div><div class="d">patterns & structures</div></div>
+  <div class="stat"><div class="k">Completed</div><div class="v" id="dashDone">0 / 0</div><div class="d">words mastered</div></div>
+  <div class="stat"><div class="k">Quiz Score</div><div class="v" id="dashScore">0 / 0</div><div class="d">correct answers</div></div>
+ </div>
+
+ <div class="card">
+  <div class="section-head"><h2>Your progress</h2><span class="small muted" id="progressPct">0%</span></div>
+  <div class="progress-track" role="progressbar" aria-labelledby="progressLabel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressTrack"><div class="progress-fill" id="progressBar"></div></div>
+  <p class="small muted" id="progressLabel" style="margin:8px 0 0">Start with the Vocabulary tab to begin learning N5 words.</p>
+  <div class="btn-row" style="margin-top:12px">
+   <button type="button" class="btn primary" id="startVocabBtn">Start learning →</button>
+   <button type="button" class="btn" id="startFlashBtn">Quick flashcards</button>
+   <button type="button" class="btn" id="startQuizBtn">Take a quiz</button>
+   <button type="button" class="btn ghost" id="resetAllBtn">Reset progress</button>
+  </div>
+ </div>
+
+ <div class="path-grid">
+  <div class="path-card" data-goto="vocab">
+   <div class="eyebrow">Vocabulary</div>
+   <h3>Learn every word</h3>
+   <p>Browse all N5 and N4 vocabulary with readings, meanings, and mnemonic tips. Filter by topic or level.</p>
+   <button type="button" class="btn small primary">Open vocabulary →</button>
+  </div>
+  <div class="path-card" data-goto="grammar">
+   <div class="eyebrow">Grammar</div>
+   <h3>Master all patterns</h3>
+   <p>Every N5 and N4 grammar point with structure, examples, English translation, and memory tricks.</p>
+   <button type="button" class="btn small primary">Open grammar →</button>
+  </div>
+  <div class="path-card" data-goto="flashcards">
+   <div class="eyebrow">Flashcards</div>
+   <h3>Spaced repetition</h3>
+   <p>Use the built-in SRS system to review words at the optimal time. Rate your recall and track mastery.</p>
+   <button type="button" class="btn small primary">Start flashcards →</button>
+  </div>
+  <div class="path-card" data-goto="practice">
+   <div class="eyebrow">Practice</div>
+   <h3>Test yourself</h3>
+   <p>Multiple-choice quizzes, fill-in-the-blank, and grammar sentence building. Timed and untimed modes.</p>
+   <button type="button" class="btn small primary">Take a quiz →</button>
+  </div>
+ </div>
+</section>
+
+<!-- ====== VOCABULARY ====== -->
+<section class="view" id="view-vocab">
+ <div class="eyebrow">Vocabulary library</div>
+ <h1 style="font-size:clamp(20px,2.5vw,26px);letter-spacing:-.02em;margin:0 0 6px">Vocabulary</h1>
+ <p class="lead">Every JLPT N5 and N4 word with kanji, kana reading, English meaning, and a mnemonic hint.</p>
+ <input class="search-box" type="search" id="vocabSearch" placeholder="Search by kanji, kana, or English…" aria-label="Search vocabulary">
+ <div class="filter-row" id="vocabFilters">
+  <button type="button" class="filter-btn active" data-vlevel="all">All</button>
+  <button type="button" class="filter-btn" data-vlevel="n5">N5</button>
+  <button type="button" class="filter-btn" data-vlevel="n4">N4</button>
+  <button type="button" class="filter-btn" data-vtopic="all">All topics</button>
+  <button type="button" class="filter-btn" data-vtopic="noun">Nouns</button>
+  <button type="button" class="filter-btn" data-vtopic="verb">Verbs</button>
+  <button type="button" class="filter-btn" data-vtopic="adjective">Adjectives</button>
+  <button type="button" class="filter-btn" data-vtopic="adverb">Adverbs</button>
+  <button type="button" class="filter-btn" data-vtopic="expression">Expressions</button>
+ </div>
+ <div class="small muted" id="vocabShown" style="margin-bottom:10px"></div>
+ <div id="vocabList"></div>
+ <div class="btn-row" style="margin-top:12px">
+  <button type="button" class="btn" id="loadMoreVocab">Load more</button>
+ </div>
+</section>
+
+<!-- ====== GRAMMAR ====== -->
+<section class="view" id="view-grammar">
+ <div class="eyebrow">Grammar reference</div>
+ <h1 style="font-size:clamp(20px,2.5vw,26px);letter-spacing:-.02em;margin:0 0 6px">Grammar</h1>
+ <p class="lead">All JLPT N5 and N4 grammar patterns with structure, meaning, examples, English translation, and memory aids.</p>
+ <input class="search-box" type="search" id="grammarSearch" placeholder="Search grammar patterns…" aria-label="Search grammar">
+ <div class="filter-row" id="grammarFilters">
+  <button type="button" class="filter-btn active" data-glevel="all">All</button>
+  <button type="button" class="filter-btn" data-glevel="n5">N5</button>
+  <button type="button" class="filter-btn" data-glevel="n4">N4</button>
+ </div>
+ <div class="small muted" id="grammarShown" style="margin-bottom:10px"></div>
+ <div id="grammarList"></div>
+</section>
+
+<!-- ====== PRACTICE ====== -->
+<section class="view" id="view-practice">
+ <div class="eyebrow">Test your knowledge</div>
+ <h1 style="font-size:clamp(20px,2.5vw,26px);letter-spacing:-.02em;margin:0 0 6px">Practice & Quizzes</h1>
+ <p class="lead">Multiple-choice quizzes, fill-in-the-blank, and grammar exercises. Choose a mode below.</p>
+
+ <div class="card" style="margin-bottom:14px">
+  <div class="section-head"><h2>Quiz settings</h2><span class="small muted" id="practiceScore">Score: 0 / 0</span></div>
+  <div class="grid-3" style="gap:10px">
+   <div><label class="tiny" for="quizType" style="display:block;margin-bottom:4px">Question type</label>
+    <select id="quizType" style="width:100%;padding:8px;border-radius:7px;border:1px solid var(--line2);background:var(--panel3);color:var(--text)">
+     <option value="mixed">Mixed (all types)</option>
+     <option value="meaning">Meaning: Japanese → English</option>
+     <option value="reading">Reading: Kanji → Kana</option>
+     <option value="reverse">Reverse: English → Japanese</option>
+     <option value="grammar">Grammar patterns</option>
+    </select></div>
+   <div><label class="tiny" for="quizLevel" style="display:block;margin-bottom:4px">Level</label>
+    <select id="quizLevel" style="width:100%;padding:8px;border-radius:7px;border:1px solid var(--line2);background:var(--panel3);color:var(--text)">
+     <option value="all">All levels</option>
+     <option value="n5">JLPT N5</option>
+     <option value="n4">JLPT N4</option>
+    </select></div>
+   <div><label class="tiny" for="quizCount" style="display:block;margin-bottom:4px">Questions</label>
+    <select id="quizCount" style="width:100%;padding:8px;border-radius:7px;border:1px solid var(--line2);background:var(--panel3);color:var(--text)">
+     <option value="10">10</option>
+     <option value="20" selected>20</option>
+     <option value="30">30</option>
+     <option value="50">50</option>
+    </select></div>
+  </div>
+  <div class="btn-row" style="margin-top:12px">
+   <button type="button" class="btn primary" id="startQuiz">Generate quiz</button>
+   <button type="button" class="btn" id="clearQuiz">Clear</button>
+  </div>
+ </div>
+
+ <div id="quizArea"></div>
+</section>
+
+<!-- ====== FLASHCARDS ====== -->
+<section class="view" id="view-flashcards">
+ <div class="eyebrow">Spaced repetition system</div>
+ <h1 style="font-size:clamp(20px,2.5vw,26px);letter-spacing:-.02em;margin:0 0 6px">Flashcards</h1>
+ <p class="lead">Review words using a spaced-repetition algorithm. Rate each card honestly — the scheduler adjusts review intervals based on your recall quality.</p>
+
+ <div class="card" style="margin-bottom:14px">
+  <div class="section-head">
+   <h2 style="margin:0">Study session</h2>
+   <span class="small muted" id="srsStatus">Ready</span>
+  </div>
+  <div class="grid-3" style="gap:10px;margin-bottom:12px">
+   <div><label class="tiny" for="srsLevel" style="display:block;margin-bottom:4px">Level</label>
+    <select id="srsLevel" style="width:100%;padding:8px;border-radius:7px;border:1px solid var(--line2);background:var(--panel3);color:var(--text)">
+     <option value="all">All levels</option>
+     <option value="n5">JLPT N5</option>
+     <option value="n4">JLPT N4</option>
+    </select></div>
+   <div><label class="tiny" for="srsTopic" style="display:block;margin-bottom:4px">Topic</label>
+    <select id="srsTopic" style="width:100%;padding:8px;border-radius:7px;border:1px solid var(--line2);background:var(--panel3);color:var(--text)">
+     <option value="all">All topics</option>
+     <option value="noun">Nouns</option>
+     <option value="verb">Verbs</option>
+     <option value="adjective">Adjectives</option>
+     <option value="adverb">Adverbs</option>
+     <option value="expression">Expressions</option>
+    </select></div>
+   <div><label class="tiny" for="srsMode" style="display:block;margin-bottom:4px">Card direction</label>
+    <select id="srsMode" style="width:100%;padding:8px;border-radius:7px;border:1px solid var(--line2);background:var(--panel3);color:var(--text)">
+     <option value="jp-en">Japanese → English</option>
+     <option value="en-jp">English → Japanese</option>
+    </select></div>
+  </div>
+  <div class="btn-row">
+   <button type="button" class="btn primary" id="startSrs">Start / Resume</button>
+   <button type="button" class="btn" id="srsShuffle">Shuffle deck</button>
+   <button type="button" class="btn" id="srsReset">Reset SRS</button>
+  </div>
+ </div>
+
+ <div id="srsArea"></div>
+</section>
+
+<!-- ====== MNEMONICS / MEMORY LAB ====== -->
+<section class="view" id="view-mnemonics">
+ <div class="eyebrow">Memory techniques</div>
+ <h1 style="font-size:clamp(20px,2.5vw,26px);letter-spacing:-.02em;margin:0 0 6px">Memory Lab</h1>
+ <p class="lead">Research-backed techniques to remember Japanese faster and longer. Each method includes a practical example you can apply immediately.</p>
+
+ <div class="grid-2" id="mnemonicGrid"></div>
+
+ <div class="card" style="margin-top:14px">
+  <h2>How to use mnemonics</h2>
+  <ol style="padding-left:20px;margin:8px 0;color:var(--muted);font-size:13px;line-height:1.9">
+   <li><strong>Make it vivid.</strong> The funnier, stranger, or more exaggerated the image, the stronger the memory. A ridiculous image beats a sensible one.</li>
+   <li><strong>Use all your senses.</strong> Imagine the sound, smell, texture, and motion of the scene, not just the visual.</li>
+   <li><strong>Link sound to meaning.</strong> Connect the Japanese sounds to an English word or image that sounds similar.</li>
+   <li><strong>Rehearse briefly and often.</strong> Say the mnemonic aloud 3–5 times over spaced intervals. Each recall strengthens the connection.</li>
+   <li><strong>Combine with SRS.</strong> Use the Flashcards tab to review words at expanding intervals. Mnemonics help encoding; SRS handles retention.</li>
+  </ol>
+ </div>
+</section>
+
+</main>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+'use strict';
+
+/* =====================================================================
+   1. DATA: JLPT N5 + N4 VOCABULARY
+   Format: [kanji, kana, english, level, topic, mnemonic]
+   ===================================================================== */
+const vocabulary = [
+/* ---------- N5 NOUNS ---------- */
+["私","わたし","I; me","n5","noun","Picture yourself pointing at your own chest."],
+["あなた","あなた","you","n5","noun","Sounds like “anata” — imagine “another” person facing you."],
+["人","ひと","person","n5","noun","The kanji looks like two legs walking — a person."],
+["男","おとこ","man","n5","noun","Sounds like “auto” — imagine a man driving a car."],
+["女","おんな","woman","n5","noun","The kanji shows a person with crossed legs — a woman sitting."],
+["子供","こども","child","n5","noun","“Kodo” sounds like “kiddo” — a child."],
+["友達","ともだち","friend","n5","noun","“Tomo” means friend in Japanese; “dachi” rhymes with “buddy”."],
+["先生","せんせい","teacher","n5","noun","“Sen” sounds like “sensei” from martial arts — a teacher."],
+["学生","がくせい","student","n5","noun","“Gaku” means study; “sei” means person — a studying person."],
+["学校","がっこう","school","n5","noun","“Gakko” — imagine a school with a gong."],
+["会社","かいしゃ","company","n5","noun","“Kaisha” sounds like “car share” — a company sharing cars."],
+["国","くに","country","n5","noun","The kanji is a box with a king inside — a country."],
+["家","いえ","house; home","n5","noun","The kanji shows a roof over a pig — a home."],
+["部屋","へや","room","n5","noun","“Heya” — imagine shouting “Hey ya!” in a room."],
+["台所","だいどころ","kitchen","n5","noun","“Daidokoro” — a “die-dough” place where you cook."],
+["電車","でんしゃ","train","n5","noun","“Den” means electricity; “sha” means vehicle."],
+["車","くるま","car","n5","noun","“Kuruma” — imagine a car that “cruises”."],
+["自転車","じてんしゃ","bicycle","n5","noun","“Ji” self + “ten” roll + “sha” vehicle."],
+["飛行機","ひこうき","airplane","n5","noun","“Hi” fly + “ko” go + “ki” machine."],
+["駅","えき","station","n5","noun","“Eki” sounds like “echo” — a station echoes."],
+["本","ほん","book","n5","noun","The kanji looks like a book with a spine."],
+["辞書","じしょ","dictionary","n5","noun","“Ji” word + “sho” book — a word book."],
+["新聞","しんぶん","newspaper","n5","noun","“Shin” new + “bun” hear — new things heard."],
+["手紙","てがみ","letter","n5","noun","“Te” hand + “gami” paper — hand paper."],
+["時間","じかん","time; hour","n5","noun","“Ji” time + “kan” interval."],
+["今日","きょう","today","n5","noun","“Kyou” — imagine “cue” for today’s scene."],
+["明日","あした","tomorrow","n5","noun","“Ashita” — imagine “a sheet” of tomorrow’s plans."],
+["昨日","きのう","yesterday","n5","noun","“Kinou” — imagine “key no” longer needed yesterday."],
+["毎日","まいにち","every day","n5","noun","“Mai” every + “nichi” day."],
+["朝","あさ","morning","n5","noun","“Asa” — the sun rises, “ah-sah”!"],
+["昼","ひる","noon; daytime","n5","noun","“Hiru” — the sun is high, “he-roo”!"],
+["夜","よる","night","n5","noun","“Yoru” — imagine “yawning” at night."],
+["水","みず","water","n5","noun","The kanji is splashing water."],
+["お茶","おちゃ","tea","n5","noun","“Ocha” — imagine “oh, cha!” when sipping tea."],
+["ご飯","ごはん","rice; meal","n5","noun","“Gohan” — imagine “go on” and eat your rice."],
+["肉","にく","meat","n5","noun","The kanji shows meat inside a person’s ribs."],
+["魚","さかな","fish","n5","noun","“Sakana” — a fish named “Sakana”.”"],
+["野菜","やさい","vegetables","n5","noun","“Ya” field + “sai” vegetables."],
+["果物","くだもの","fruit","n5","noun","“Kudamono” — “could a mono” be a fruit?"],
+["店","みせ","shop","n5","noun","The kanji shows a shop with a roof and a counter."],
+["お金","おかね","money","n5","noun","“Okane” — imagine “oh, can I” have money."],
+["時計","とけい","watch; clock","n5","noun","“Tokei” — imagine a clock that “tolls”."],
+["鍵","かぎ","key","n5","noun","“Kagi” — imagine a “key” that looks like a hook."],
+["傘","かさ","umbrella","n5","noun","“Kasa” — the kanji looks like an umbrella with ribs."],
+["窓","まど","window","n5","noun","“Mado” — imagine a window “my door”."],
+["机","つくえ","desk","n5","noun","“Tsukue” — “suku-e” table you study on."],
+["椅子","いす","chair","n5","noun","“Isu” — imagine an “easy” chair."],
+["電気","でんき","electricity; light","n5","noun","“Den” electric + “ki” spirit."],
+["電話","でんわ","telephone","n5","noun","“Den” electric + “wa” talk."],
+["名前","なまえ","name","n5","noun","“Na” what + “mae” front — what’s in front of you."],
+["質問","しつもん","question","n5","noun","“Shitsu” quality + “mon” ask."],
+["問題","もんだい","problem","n5","noun","“Mon” ask + “dai” topic."],
+["仕事","しごと","work; job","n5","noun","“Shi” do + “goto” thing."],
+["旅行","りょこう","travel","n5","noun","“Ryo” journey + “kou” go."],
+["天気","てんき","weather","n5","noun","“Ten” sky + “ki” spirit."],
+["空","そら","sky","n5","noun","“Sora” — imagine the “sora” above you."],
+["海","うみ","sea; ocean","n5","noun","“Umi” — imagine “oo-me” in the sea."],
+["山","やま","mountain","n5","noun","The kanji looks like a mountain peak."],
+["川","かわ","river","n5","noun","The kanji shows flowing water lines."],
+["花","はな","flower","n5","noun","“Hana” — imagine a “ha-na” flower blooming."],
+["犬","いぬ","dog","n5","noun","“Inu” — imagine a dog saying “in-oo”."],
+["猫","ねこ","cat","n5","noun","“Neko” — imagine a cat saying “neko”."],
+["鳥","とり","bird","n5","noun","“Tori” — imagine a bird on a “tree”."],
+["音楽","おんがく","music","n5","noun","“On” sound + “gaku” enjoy."],
+["映画","えいが","movie","n5","noun","“Ei” reflect + “ga” picture."],
+["写真","しゃしん","photograph","n5","noun","“Sha” copy + “shin” truth."],
+["手","て","hand","n5","noun","The kanji looks like a hand with fingers."],
+["足","あし","foot; leg","n5","noun","“Ashi” — imagine “ashy” feet."],
+["目","め","eye","n5","noun","The kanji is a vertical eye."],
+["耳","みみ","ear","n5","noun","The kanji looks like an ear."],
+["口","くち","mouth","n5","noun","The kanji is a square mouth."],
+["体","からだ","body","n5","noun","“Karada” — imagine a body that “carries” you."],
+["頭","あたま","head","n5","noun","“Atama” — imagine a head that’s “at the top”."],
+["心","こころ","heart; mind","n5","noun","“Kokoro” — imagine a heart that goes “ko-ko-ro”."],
+["病気","びょうき","illness; sick","n5","noun","“Byou” sick + “ki” spirit."],
+["薬","くすり","medicine","n5","noun","“Kusuri” — imagine medicine that “cures”."],
+["休み","やすみ","rest; holiday","n5","noun","“Yasumi” — imagine “ya, rest” and be lazy."],
+["誕生日","たんじょうび","birthday","n5","noun","“Tan” born + “jou” day + “bi” day."],
+["結婚","けっこん","marriage","n5","noun","“Kekkon” — imagine a couple “connect” in marriage."],
+["家族","かぞく","family","n5","noun","“Kazoku” — imagine “ka” family “zoku” together."],
+["父","ちち","father","n5","noun","“Chichi” — imagine dad saying “chee-chee”."],
+["母","はは","mother","n5","noun","“Haha” — imagine mum laughing “ha-ha”."],
+["兄","あに","older brother","n5","noun","“Ani” — imagine your “ani” (brother) is an “onii”."],
+["姉","あね","older sister","n5","noun","“Ane” — imagine your “ane” (sister) is “a ne”."],
+["弟","おとうと","younger brother","n5","noun","“Otouto” — imagine “oh, to-to” little brother."],
+["妹","いもうと","younger sister","n5","noun","“Imouto” — imagine “ee-mo-to” little sister."],
+["夫","おっと","husband","n5","noun","“Otto” — imagine a husband named “Otto”."],
+["妻","つま","wife","n5","noun","“Tsuma” — imagine a wife who “tsooma” around."],
+
+/* ---------- N5 VERBS ---------- */
+["食べる","たべる","to eat","n5","verb","“Tabe” sounds like “table” — eat at the table."],
+["飲む","のむ","to drink","n5","verb","“Nomu” — imagine “no mo” drink for you."],
+["行く","いく","to go","n5","verb","“Iku” — imagine “I go” with “iku”."],
+["来る","くる","to come","n5","verb","“Kuru” — imagine a car “coming” to you."],
+["見る","みる","to see; to watch","n5","verb","“Miru” — imagine a “mirror” to see."],
+["聞く","きく","to hear; to listen","n5","verb","“Kiku” — imagine “key” to listening."],
+["話す","はなす","to speak; to talk","n5","verb","“Hanasu” — imagine “ha-na-su” you talk."],
+["読む","よむ","to read","n5","verb","“Yomu” — imagine “yo, mum” reading."],
+["書く","かく","to write","n5","verb","“Kaku” — imagine “cocoa” writing."],
+["買う","かう","to buy","n5","verb","“Kau” — imagine a “cow” to buy."],
+["売る","うる","to sell","n5","verb","“Uru” — imagine “you rule” if you sell."],
+["待つ","まつ","to wait","n5","verb","“Matsu” — imagine “mat” and wait."],
+["使う","つかう","to use","n5","verb","“Tsukau” — imagine “sue cow” to use."],
+["作る","つくる","to make; to create","n5","verb","“Tsukuru” — imagine “sue cook” to make."],
+["休む","やすむ","to rest","n5","verb","“Yasumu” — imagine “ya, rest” and “moo”."],
+["働く","はたらく","to work","n5","verb","“Hataraku” — imagine “hot rack” at work."],
+["勉強する","べんきょうする","to study","n5","verb","“Benkyou” — imagine “ben” studying with “kyou”."],
+["遊ぶ","あそぶ","to play; to have fun","n5","verb","“Asobu” — imagine “a sob” of joy playing."],
+["寝る","ねる","to sleep","n5","verb","“Neru” — imagine “ne” sleep in “ru” bed."],
+["起きる","おきる","to wake up","n5","verb","“Okiru” — imagine “o key” to wake up."],
+["着る","きる","to wear","n5","verb","“Kiru” — imagine “key” to wearing clothes."],
+["脱ぐ","ぬぐ","to take off (clothes)","n5","verb","“Nugu” — imagine “new goo” when taking off."],
+["洗う","あらう","to wash","n5","verb","“Arau” — imagine “a row” of washing."],
+["開ける","あける","to open","n5","verb","“Akeru” — imagine “a care” to open."],
+["閉める","しめる","to close","n5","verb","“Shimeru” — imagine “she meru” to close."],
+["教える","おしえる","to teach","n5","verb","“Oshieru” — imagine “oh she” teaches."],
+["習う","ならう","to learn","n5","verb","“Narau” — imagine “now” you learn."],
+["覚える","おぼえる","to memorize","n5","verb","“Oboeru” — imagine “oh boy” to memorize."],
+["忘れる","わすれる","to forget","n5","verb","“Wasureru” — imagine “wa, sorry” to forget."],
+["分かる","わかる","to understand","n5","verb","“Wakaru” — imagine “walk” to understand."],
+["知る","しる","to know","n5","verb","“Shiru” — imagine “she knew” to know."],
+["思う","おもう","to think","n5","verb","“Omou” — imagine “oh mo” thinking."],
+["言う","いう","to say","n5","verb","“Iu” — imagine “you” say."],
+["立つ","たつ","to stand","n5","verb","“Tatsu” — imagine “tat” stood up."],
+["座る","すわる","to sit","n5","verb","“Suwaru” — imagine “suave” sitting."],
+["歩く","あるく","to walk","n5","verb","“Aruku” — imagine “a walk”."],
+["走る","はしる","to run","n5","verb","“Hashiru” — imagine “ha, sure” you run."],
+["泳ぐ","およぐ","to swim","n5","verb","“Oyogu” — imagine “oh yo, go” swim."],
+["飛ぶ","とぶ","to fly","n5","verb","“Tobu” — imagine “toe boo” flying."],
+["死ぬ","しぬ","to die","n5","verb","“Shinu” — imagine “she knew” death."],
+["生まれる","うまれる","to be born","n5","verb","“Umareru” — imagine “oo, ma” born."],
+["住む","すむ","to live; to reside","n5","verb","“Sumu” — imagine “sue moo” lives here."],
+["帰る","かえる","to return; to go home","n5","verb","“Kaeru” — imagine “kaeru” the frog returns home."],
+["入る","はいる","to enter","n5","verb","“Hairu” — imagine “hair” entering the door."],
+["出る","でる","to exit; to leave","n5","verb","“Deru” — imagine “dare you” to leave."],
+["飲む","のむ","to drink","n5","verb","“Nomu” — imagine “no mo” drink."],
+["撮る","とる","to take (a photo)","n5","verb","“Toru” — imagine “tore” a photo."],
+["呼ぶ","よぶ","to call","n5","verb","“Yobu” — imagine “yo boo” call me."],
+["会う","あう","to meet","n5","verb","“Au” — imagine “a u” meeting."],
+
+/* ---------- N5 ADJECTIVES ---------- */
+["大きい","おおきい","big; large","n5","adjective","“Ookii” — imagine “oh key” but it’s big."],
+["小さい","ちいさい","small; little","n5","adjective","“Chiisai” — imagine “chee-sai” tiny."],
+["高い","たかい","high; expensive","n5","adjective","“Takai” — imagine “ta-cow” high price."],
+["安い","やすい","cheap; inexpensive","n5","adjective","“Yasui” — imagine “yes, easy” cheap."],
+["新しい","あたらしい","new","n5","adjective","“Atarashii” — imagine “a tar a she” new."],
+["古い","ふるい","old (things)","n5","adjective","“Furui” — imagine “flu” old."],
+["良い","よい","good","n5","adjective","“Yoi” — imagine “yo, it’s good!”"],
+["悪い","わるい","bad","n5","adjective","“Warui” — imagine “war” is bad."],
+["暑い","あつい","hot (weather)","n5","adjective","“Atsui” — imagine “at sue” it’s hot."],
+["寒い","さむい","cold (weather)","n5","adjective","“Samui” — imagine “saw me” in the cold."],
+["熱い","あつい","hot (things)","n5","adjective","“Atsui” — imagine “hot” tea."],
+["冷たい","つめたい","cold (things)","n5","adjective","“Tsumetai” — imagine “tsu-me-tie” cold."],
+["難しい","むずかしい","difficult","n5","adjective","“Muzukashii” — imagine “moo-zoo” difficult."],
+["易しい","やさしい","easy","n5","adjective","“Yasashii” — imagine “ya, sashimi” easy."],
+["面白い","おもしろい","interesting; funny","n5","adjective","“Omoshiroi” — imagine “oh mo she roy” funny."],
+["楽しい","たのしい","enjoyable; fun","n5","adjective","“Tanoshii” — imagine “ta-no-she” fun."],
+["嬉しい","うれしい","happy; glad","n5","adjective","“Ureshii” — imagine “ooh, ray she” happy."],
+["悲しい","かなしい","sad","n5","adjective","“Kanashii” — imagine “ka-na-she” sad."],
+["美味しい","おいしい","delicious","n5","adjective","“Oishii” — imagine “oy, she” delicious!"],
+["汚い","きたない","dirty","n5","adjective","“Kitanai” — imagine “kit a nye” dirty."],
+["忙しい","いそがしい","busy","n5","adjective","“Isogashii” — imagine “iso gas” busy."],
+["可愛い","かわいい","cute","n5","adjective","“Kawaii” — imagine “kawaii” cute."],
+["きれい","きれい","pretty; clean","n5","adjective","“Kirei” — imagine “key ray” pretty."],
+["元気","げんき","healthy; energetic","n5","adjective","“Genki” — imagine “genki” energy."],
+["静か","しずか","quiet","n5","adjective","“Shizuka” — imagine “shh, zoo ka” quiet."],
+["賑やか","にぎやか","lively; bustling","n5","adjective","“Nigiyaka” — imagine “knee gee ya ka” lively."],
+["便利","べんり","convenient","n5","adjective","“Benri” — imagine “ben” and “ri” convenient."],
+["有名","ゆうめい","famous","n5","adjective","“Yuumei” — imagine “you may” be famous."],
+["親切","しんせつ","kind","n5","adjective","“Shinsetsu” — imagine “shin setsu” kind."],
+["大丈夫","だいじょうぶ","okay; all right","n5","adjective","“Daijoubu” — imagine “die joe boo” it’s okay."],
+
+/* ---------- N5 ADVERBS & EXPRESSIONS ---------- */
+["とても","とても","very","n5","adverb","“Totemo” — imagine “total mo” very much."],
+["少し","すこし","a little","n5","adverb","“Sukoshi” — imagine “sue ko she” a little."],
+["たくさん","たくさん","many; a lot","n5","adverb","“Takusan” — imagine “taco sun” many tacos."],
+["いつも","いつも","always","n5","adverb","“Itsumo” — imagine “it’s mo” always."],
+["時々","ときどき","sometimes","n5","adverb","“Tokidoki” — imagine “toki doki” sometimes."],
+["また","また","again","n5","adverb","“Mata” — imagine “mata” again."],
+["もう","もう","already; anymore","n5","adverb","“Mou” — imagine “mow” already done."],
+["まだ","まだ","not yet; still","n5","adverb","“Mada” — imagine “ma da” not yet."],
+["ゆっくり","ゆっくり","slowly","n5","adverb","“Yukkuri” — imagine “you could” go slowly."],
+["一緒に","いっしょに","together","n5","adverb","“Issho ni” — imagine “ee show nee” together."],
+["こんにちは","こんにちは","hello; good afternoon","n5","expression","“Konnichiwa” — imagine “con-nee-chee-wa” greeting."],
+["おはよう","おはよう","good morning","n5","expression","“Ohayou” — imagine “ohio” in the morning."],
+["こんばんは","こんばんは","good evening","n5","expression","“Konbanwa” — imagine “comb ban wa” evening."],
+["さようなら","さようなら","goodbye","n5","expression","“Sayounara” — imagine “say oh na ra” goodbye."],
+["ありがとう","ありがとう","thank you","n5","expression","“Arigatou” — imagine “a ri ga toe” thanks."],
+["すみません","すみません","excuse me; sorry","n5","expression","“Sumimasen” — imagine “sue me ma sen” excuse me."],
+["はい","はい","yes","n5","expression","“Hai” — imagine “hi” yes!"],
+["いいえ","いいえ","no","n5","expression","“Iie” — imagine “ee-eh” no."],
+["どうぞ","どうぞ","please; go ahead","n5","expression","“Douzo” — imagine “do zo” please."],
+["よろしく","よろしく","nice to meet you; please treat me well","n5","expression","“Yoroshiku” — imagine “yo ro she coo”."],
+
+/* ---------- N4 NOUNS ---------- */
+["間","あいだ","space; interval; between","n4","noun","“Aida” — imagine “aida” between two things."],
+["赤ちゃん","あかちゃん","baby","n4","noun","“Akachan” — imagine “a ka chan” baby."],
+["味","あじ","flavour; taste","n4","noun","“Aji” — imagine “ah gee” tasty."],
+["アジア","アジア","Asia","n4","noun","“Ajia” — sounds like “Asia”."],
+["遊び","あそび","play; playing","n4","noun","“Asobi” — from “asobu” (to play)."],
+["安心","あんしん","relief; peace of mind","n4","noun","“Anshin” — imagine “an shin” safe."],
+["安全","あんぜん","safety","n4","noun","“Anzen” — imagine “an zen” safe."],
+["以下","いか","less than; below","n4","noun","“Ika” — imagine “eeka” below."],
+["以外","いがい","with the exception of","n4","noun","“Igai” — imagine “ee guy” except."],
+["医学","いがく","medical science","n4","noun","“Igaku” — “i” medicine + “gaku” study."],
+["意見","いけん","opinion","n4","noun","“Iken” — imagine “ee ken” opinion."],
+["石","いし","stone","n4","noun","“Ishi” — imagine “ee she” stone."],
+["以上","いじょう","more than; this is all","n4","noun","“Ijou” — imagine “ee joe” more."],
+["一生懸命","いっしょうけんめい","with utmost effort","n4","noun","“Isshoukenmei” — imagine “ee show ken may” hard work."],
+["糸","いと","thread","n4","noun","“Ito” — imagine “ee toe” thread."],
+["以内","いない","within","n4","noun","“Inai” — imagine “ee nye” inside."],
+["田舎","いなか","countryside","n4","noun","“Inaka” — imagine “ee na ka” rural."],
+["受付","うけつけ","reception; receipt","n4","noun","“Uketsuke” — imagine “oo ket sue kay” reception."],
+["腕","うで","arm","n4","noun","“Ude” — imagine “oo day” arm."],
+["裏","うら","reverse side; back","n4","noun","“Ura” — imagine “oo ra” behind."],
+["売り場","うりば","place where things are sold","n4","noun","“Uriba” — “uri” sell + “ba” place."],
+["運転手","うんてんしゅ","driver","n4","noun","“Untenshu” — “unten” drive + “shu” person."],
+["枝","えだ","branch; twig","n4","noun","“Eda” — imagine “eh da” branch."],
+["お祝い","おいわい","congratulation","n4","noun","“Oiwai” — imagine “oy why” celebrate."],
+["億","おく","one hundred million","n4","noun","“Oku” — imagine “oh coo” huge number."],
+["屋上","おくじょう","rooftop","n4","noun","“Okujou” — “oku” roof + “jou” top."],
+["贈り物","おくりもの","gift","n4","noun","“Okurimono” — “okuri” send + “mono” thing."],
+["押し入れ","おしいれ","closet","n4","noun","“Oshiire” — “oshi” push + “ire” put in."],
+["お嬢さん","おじょうさん","young lady","n4","noun","“Ojousan” — imagine “oh joe san” young lady."],
+["夫","おっと","husband","n4","noun","“Otto” — imagine a husband named Otto."],
+["おつり","おつり","change (from purchase)","n4","noun","“Otsuri” — imagine “oh tsur ee” change."],
+["音","おと","sound; note","n4","noun","“Oto” — imagine “oh toe” sound."],
+["踊り","おどり","a dance","n4","noun","“Odori” — from “odoru” (to dance)."],
+["お祭り","おまつり","festival","n4","noun","“Omatsuri” — imagine “oh mat sue ree” festival."],
+["お見舞い","おみまい","calling on someone who is ill","n4","noun","“Omimai” — imagine “oh me my” visit."],
+["お土産","おみやげ","souvenir","n4","noun","“Omiyage” — imagine “oh me ya gay” souvenir."],
+["おもちゃ","おもちゃ","toy","n4","noun","“Omo cha” — imagine “oh mo cha” toy."],
+["表","おもて","the front","n4","noun","“Omote” — imagine “oh mo te” front."],
+["親","おや","parents","n4","noun","“Oya” — imagine “oh ya” parents."],
+["泳ぎ方","およぎかた","way of swimming","n4","noun","“Oyogikata” — “oyogi” swim + “kata” way."],
+["お礼","おれい","expression of gratitude","n4","noun","“Orei” — imagine “oh ray” thanks."],
+["終わり","おわり","the end","n4","noun","“Owari” — imagine “oh war ee” end."],
+["カーテン","カーテン","curtain","n4","noun","“Kaaten” — sounds like “curtain”."],
+["会議","かいぎ","meeting","n4","noun","“Kaigi” — imagine “ky gee” meeting."],
+["会場","かいじょう","venue; hall","n4","noun","“Kaijou” — “kai” meeting + “jou” place."],
+["外国人","がいこくじん","foreigner","n4","noun","“Gaikokujin” — “gai” outside + “koku” country + “jin” person."],
+["階段","かいだん","stairs","n4","noun","“Kaidan” — imagine “ky dan” stairs."],
+["買い物","かいもの","shopping","n4","noun","“Kaimono” — “kai” buy + “mono” thing."],
+["顔","かお","face","n4","noun","“Kao” — imagine “cow” face."],
+["科学","かがく","science","n4","noun","“Kagaku” — imagine “ka ga ku” science."],
+["鏡","かがみ","mirror","n4","noun","“Kagami” — imagine “ka ga me” mirror."],
+["火事","かじ","fire","n4","noun","“Kaji” — imagine “ka gee” fire."],
+["ガス","ガス","gas","n4","noun","“Gasu” — sounds like “gas”."],
+["形","かたち","shape; form","n4","noun","“Katachi” — imagine “ka ta chee” shape."],
+["家庭","かてい","household; family","n4","noun","“Katei” — imagine “ka tay” home."],
+["角","かど","corner","n4","noun","“Kado” — imagine “ka do” corner."],
+["髪","かみ","hair","n4","noun","“Kami” — imagine “ka me” hair."],
+["紙","かみ","paper","n4","noun","“Kami” — imagine “ka me” paper."],
+["彼女","かのじょ","she; girlfriend","n4","noun","“Kanojo” — imagine “ka no jo” her."],
+["彼","かれ","he; boyfriend","n4","noun","“Kare” — imagine “ka ray” him."],
+["川","かわ","river","n4","noun","“Kawa” — imagine “ka wa” river."],
+["可愛がる","かわいがる","to love; to cherish","n4","verb","“Kawaigaru” — from “kawaii” cute."],
+["感覚","かんかく","sense; sensation","n4","noun","“Kankaku” — imagine “kan ka ku” sense."],
+["関係","かんけい","relationship","n4","noun","“Kankei” — imagine “kan kay” relation."],
+["看護師","かんごし","nurse","n4","noun","“Kangoshi” — “kango” nursing + “shi” person."],
+["簡単","かんたん","simple; easy","n4","adjective","“Kantan” — imagine “con tan” simple."],
+["気分","きぶん","feeling; mood","n4","noun","“Kibun” — imagine “key boon” mood."],
+["決める","きめる","to decide","n4","verb","“Kimeru” — imagine “key mare” decide."],
+["気持ち","きもち","feeling; sensation","n4","noun","“Kimochi” — imagine “key mo chee” feeling."],
+["着物","きもの","kimono","n4","noun","“Kimono” — literally “wear thing”."],
+["客","きゃく","guest; customer","n4","noun","“Kyaku” — imagine “kyak” guest."],
+["急","きゅう","sudden; urgent","n4","adjective","“Kyuu” — imagine “Q” urgent."],
+["教育","きょういく","education","n4","noun","“Kyouiku” — imagine “kyo ee ku” education."],
+["教会","きょうかい","church","n4","noun","“Kyoukai” — imagine “kyo kai” church."],
+["興味","きょうみ","interest","n4","noun","“Kyoumi” — imagine “kyo me” interest."],
+["近所","きんじょ","neighbourhood","n4","noun","“Kinjo” — imagine “kin jo” neighbourhood."],
+["空気","くうき","air; atmosphere","n4","noun","“Kuuki” — imagine “koo key” air."],
+["空港","くうこう","airport","n4","noun","“Kuukou” — “kuu” sky + “kou” port."],
+["草","くさ","grass","n4","noun","“Kusa” — imagine “koo sa” grass."],
+["首","くび","neck","n4","noun","“Kubi” — imagine “koo bee” neck."],
+["雲","くも","cloud","n4","noun","“Kumo” — imagine “koo mo” cloud."],
+["毛","け","hair; fur","n4","noun","“Ke” — imagine “keh” hair."],
+["経済","けいざい","economy","n4","noun","“Keizai” — imagine “kay zy” economy."],
+["警察","けいさつ","police","n4","noun","“Keisatsu” — imagine “kay sat sue” police."],
+["怪我","けが","injury","n4","noun","“Kega” — imagine “keg a” injury."],
+["景色","けしき","scenery","n4","noun","“Keshiki” — imagine “kesh key” scenery."],
+["下宿","げしゅく","boarding house","n4","noun","“Geshyuku” — imagine “ge shuck” lodging."],
+["決心","けっしん","determination","n4","noun","“Kesshin” — imagine “kesh in” determination."],
+["欠席","けっせき","absence","n4","noun","“Kesseki” — imagine “kes sek ee” absence."],
+["結果","けっか","result","n4","noun","“Kekka” — imagine “kek ka” result."],
+["結婚","けっこん","marriage","n4","noun","“Kekkon” — imagine “kek kon” marriage."],
+["建築","けんちく","architecture","n4","noun","“Kenchiku” — imagine “ken chee ku” building."],
+["原因","げんいん","cause","n4","noun","“Genin” — imagine “gen in” cause."],
+["喧嘩","けんか","quarrel","n4","noun","“Kenka” — imagine “ken ka” fight."],
+["研究","けんきゅう","research","n4","noun","“Kenkyuu” — imagine “ken Q” research."],
+["見物","けんぶつ","sightseeing","n4","noun","“Kenbutsu” — “ken” see + “butsu” thing."],
+["子","こ","child","n4","noun","“Ko” — imagine “co” child."],
+["公園","こうえん","park","n4","noun","“Kouen” — imagine “ko en” park."],
+["工場","こうじょう","factory","n4","noun","“Koujou” — “kou” work + “jou” place."],
+["高校","こうこう","high school","n4","noun","“Koukou” — imagine “ko ko” high school."],
+["交通","こうつう","traffic; transportation","n4","noun","“Koutsuu” — imagine “ko tsu” traffic."],
+["声","こえ","voice","n4","noun","“Koe” — imagine “ko eh” voice."],
+["心","こころ","heart; mind","n4","noun","“Kokoro” — imagine “ko ko ro” heart."],
+["国際","こくさい","international","n4","noun","“Kokusai” — imagine “ko ku sai” international."],
+["黒","くろ","black","n4","noun","“Kuro” — imagine “koo ro” black."],
+["今度","こんど","next time","n4","noun","“Kondo” — imagine “kon do” next."],
+["混雑","こんざつ","congestion","n4","noun","“Konzatsu” — imagine “kon zat sue” crowded."],
+["今夜","こんや","tonight","n4","noun","“Kon’ya” — imagine “kon ya” tonight."],
+["最近","さいきん","recently","n4","noun","“Saikin” — imagine “sigh kin” recently."],
+["最後","さいご","last","n4","noun","“Saigo” — imagine “sigh go” last."],
+["最初","さいしょ","first","n4","noun","“Saisho” — imagine “sigh show” first."],
+["財布","さいふ","wallet","n4","noun","“Saifu” — imagine “sigh foo” wallet."],
+["坂","さか","slope; hill","n4","noun","“Saka” — imagine “sah ka” slope."],
+["盛ん","さかん","prosperous; active","n4","adjective","“Sakan” — imagine “sah kan” active."],
+["下がる","さがる","to go down","n4","verb","“Sagaru” — imagine “sah ga roo” down."],
+["下げる","さげる","to lower","n4","verb","“Sageru” — imagine “sah gay roo” lower."],
+["差し上げる","さしあげる","to give (humble)","n4","verb","“Sashiageru” — humble “give”."],
+["寂しい","さびしい","lonely","n4","adjective","“Sabishii” — imagine “sah bee she” lonely."],
+["砂糖","さとう","sugar","n4","noun","“Satou” — imagine “sah toe” sugar."],
+["騒ぐ","さわぐ","to make noise","n4","verb","“Sawagu” — imagine “sah wa goo” noisy."],
+["触る","さわる","to touch","n4","verb","“Sawaru” — imagine “sah wa roo” touch."],
+["産業","さんぎょう","industry","n4","noun","“Sangyou” — imagine “san gyo” industry."],
+["賛成","さんせい","agreement; approval","n4","noun","“Sansei” — imagine “san say” agree."],
+["残念","ざんねん","regrettable; unfortunate","n4","adjective","“Zannen” — imagine “zan nen” regret."],
+["市","し","city","n4","noun","“Shi” — imagine “she” city."],
+["字","じ","character; letter","n4","noun","“Ji” — imagine “gee” letter."],
+["試合","しあい","match; game","n4","noun","“Shiai” — imagine “she eye” match."],
+["仕方","しかた","way; method","n4","noun","“Shikata” — “shi” do + “kata” way."],
+["試験","しけん","exam","n4","noun","“Shiken” — imagine “she ken” exam."],
+["事故","じこ","accident","n4","noun","“Jiko” — imagine “gee ko” accident."],
+["仕事","しごと","work; job","n4","noun","“Shigoto” — “shi” do + “goto” thing."],
+["地震","じしん","earthquake","n4","noun","“Jishin” — “ji” earth + “shin” shake."],
+["時代","じだい","era; period","n4","noun","“Jidai” — imagine “gee die” era."],
+["下着","したぎ","underwear","n4","noun","“Shitagi” — “shita” under + “gi” wear."],
+["支度","したく","preparation","n4","noun","“Shitaku” — imagine “she tah ku” prepare."],
+["実験","じっけん","experiment","n4","noun","“Jikken” — imagine “gee ken” experiment."],
+["実際","じっさい","actually; in fact","n4","noun","“Jissai” — imagine “gee sigh” actually."],
+["失敗","しっぱい","failure; mistake","n4","noun","“Shippai” — imagine “ship pie” failure."],
+["質問","しつもん","question","n4","noun","“Shitsumon” — “shitsu” quality + “mon” ask."],
+["湿度","しつど","humidity","n4","noun","“Shitsudo” — “shitsu” moisture + “do” degree."],
+["品物","しなもの","goods; item","n4","noun","“Shinamono” — “shina” item + “mono” thing."],
+["失敗","しっぱい","mistake","n4","noun","“Shippai” — imagine “ship pie” mistake."],
+["島","しま","island","n4","noun","“Shima” — imagine “she ma” island."],
+["市民","しみん","citizen","n4","noun","“Shimin” — imagine “she min” citizen."],
+["事務所","じむしょ","office","n4","noun","“Jimusho” — “jimu” business + “sho” place."],
+["社会","しゃかい","society","n4","noun","“Shakai” — imagine “sha kai” society."],
+["社長","しゃちょう","company president","n4","noun","“Shachou” — “sha” company + “chou” head."],
+["邪魔","じゃま","hindrance; interruption","n4","noun","“Jama” — imagine “ja ma” disturb."],
+["自由","じゆう","freedom","n4","noun","“Jiyuu” — imagine “gee you” freedom."],
+["習慣","しゅうかん","custom; habit","n4","noun","“Shuukan” — imagine “shoo kan” habit."],
+["住所","じゅうしょ","address","n4","noun","“Juusho” — “juu” live + “sho” place."],
+["柔道","じゅうどう","judo","n4","noun","“Juudou” — imagine “jew doe” judo."],
+["十分","じゅうぶん","enough; sufficient","n4","adjective","“Juubun” — imagine “jew boon” enough."],
+["出席","しゅっせき","attendance","n4","noun","“Shusseki” — imagine “shus sek ee” attend."],
+["出発","しゅっぱつ","departure","n4","noun","“Shuppatsu” — “shutsu” exit + “hatsu” depart."],
+["趣味","しゅみ","hobby","n4","noun","“Shumi” — imagine “shoo me” hobby."],
+["準備","じゅんび","preparation","n4","noun","“Junbi” — imagine “june bee” prepare."],
+["紹介","しょうかい","introduction","n4","noun","“Shoukai” — imagine “show kai” introduce."],
+["使用","しよう","use","n4","noun","“Shiyou” — imagine “she yo” use."],
+["食料品","しょくりょうひん","groceries","n4","noun","“Shokuryouhin” — “shoku” food + “ryou” materials."],
+["女性","じょせい","woman; female","n4","noun","“Josei” — imagine “joe say” woman."],
+["男性","だんせい","man; male","n4","noun","“Dansei” — imagine “dan say” man."],
+["初め","はじめ","beginning","n4","noun","“Hajime” — imagine “ha jee may” beginning."],
+["初めて","はじめて","for the first time","n4","adverb","“Hajimete” — imagine “ha jee may tay” first time."],
+["場所","ばしょ","place; location","n4","noun","“Basho” — imagine “bah show” place."],
+["働く","はたらく","to work","n4","verb","“Hataraku” — imagine “hot rack” at work."],
+["花見","はなみ","flower viewing","n4","noun","“Hanami” — “hana” flower + “mi” see."],
+["林","はやし","woods; forest","n4","noun","“Hayashi” — imagine “ha ya she” forest."],
+["払う","はらう","to pay","n4","verb","“Harau” — imagine “ha rao” pay."],
+["番組","ばんぐみ","TV program","n4","noun","“Bangumi” — “ban” number + “gumi” group."],
+["引き出し","ひきだし","drawer","n4","noun","“Hikidashi” — “hiki” pull + “dashi” out."],
+["美術館","びじゅつかん","art museum","n4","noun","“Bijutsukan” — “bijutsu” art + “kan” building."],
+["病気","びょうき","illness","n4","noun","“Byouki” — “byou” sick + “ki” spirit."],
+["昼間","ひるま","daytime","n4","noun","“Hiruma” — “hiru” noon + “ma” interval."],
+["拾う","ひろう","to pick up","n4","verb","“Hiroku” — imagine “he row” pick up."],
+["増える","ふえる","to increase","n4","verb","“Fueru” — imagine “foo eh roo” increase."],
+["複雑","ふくざつ","complex; complicated","n4","adjective","“Fukuzatsu” — imagine “foo ku zat sue” complex."],
+["文化","ぶんか","culture","n4","noun","“Bunka” — imagine “boon ka” culture."],
+["文学","ぶんがく","literature","n4","noun","“Bungaku” — “bun” text + “gaku” study."],
+["文法","ぶんぽう","grammar","n4","noun","“Bunpou” — “bun” text + “pou” method."],
+["別","べつ","separate; different","n4","adjective","“Betsu” — imagine “bets” separate."],
+["返事","へんじ","reply","n4","noun","“Henji” — imagine “hen gee” reply."],
+["貿易","ぼうえき","trade","n4","noun","“Boueki” — imagine “bow eh key” trade."],
+["法律","ほうりつ","law","n4","noun","“Houritsu” — imagine “ho ritz” law."],
+["放送","ほうそう","broadcast","n4","noun","“Housou” — imagine “ho so” broadcast."],
+["訪問","ほうもん","visit","n4","noun","“Houmon” — imagine “ho mon” visit."],
+["他","ほか","other","n4","noun","“Hoka” — imagine “ho ka” other."],
+["僕","ぼく","I (male)","n4","noun","“Boku” — imagine “bo ku” me."],
+["星","ほし","star","n4","noun","“Hoshi” — imagine “ho she” star."],
+["細い","ほそい","thin; slender","n4","adjective","“Hosoi” — imagine “ho soy” thin."],
+["翻訳","ほんやく","translation","n4","noun","“Honyaku” — “hon” book + “yaku” translate."],
+["参る","まいる","to go (humble)","n4","verb","“Mairu” — humble “go”."],
+["負ける","まける","to lose","n4","verb","“Makeru” — imagine “ma care” lose."],
+["負ける","まける","to lose","n4","verb","“Makeru” — imagine “ma care” lose."],
+["まだ","まだ","not yet","n4","adverb","“Mada” — imagine “ma da” not yet."],
+["町","まち","town","n4","noun","“Machi” — imagine “ma chee” town."],
+["間違える","まちがえる","to make a mistake","n4","verb","“Machigaeru” — “machi” town + “gaeru” change."],
+["間に合う","まにあう","to be in time","n4","verb","“Maniau” — imagine “ma nee ow” in time."],
+["周り","まわり","surroundings","n4","noun","“Mawari” — imagine “ma wa ree” around."],
+["回る","まわる","to turn; to go around","n4","verb","“Mawaru” — imagine “ma wa roo” turn."],
+["漫画","まんが","manga; comic","n4","noun","“Manga” — imagine “man ga” manga."],
+["見える","みえる","to be visible","n4","verb","“Mieru” — from “miru” (to see)."],
+["見送る","みおくる","to see off","n4","verb","“Miokuru” — “mi” see + “okuru” send."],
+["磨く","みがく","to polish","n4","verb","“Migaku” — imagine “me gak” polish."],
+["見つかる","みつかる","to be found","n4","verb","“Mitsukaru” — from “mitsukeru” (to find)."],
+["見つける","みつける","to find","n4","verb","“Mitsukeru” — imagine “mit sue care” find."],
+["皆","みんな","everyone","n4","noun","“Minna” — imagine “mean na” everyone."],
+["昔","むかし","old times; past","n4","noun","“Mukashi” — imagine “moo ka she” past."],
+["虫","むし","insect","n4","noun","“Mushi” — imagine “moo she” insect."],
+["息子","むすこ","son","n4","noun","“Musuko” — imagine “moo sue ko” son."],
+["娘","むすめ","daughter","n4","noun","“Musume” — imagine “moo sue may” daughter."],
+["無理","むり","impossible; unreasonable","n4","adjective","“Muri” — imagine “moo ree” impossible."],
+["目","め","eye","n4","noun","The kanji is a vertical eye."],
+["飯","めし","meal; cooked rice","n4","noun","“Meshi” — imagine “mesh ee” meal."],
+["申し込む","もうしこむ","to apply for","n4","verb","“Moushikomu” — imagine “mo she ko moo” apply."],
+["もしもし","もしもし","hello (phone)","n4","expression","“Moshimoshi” — imagine “mo she mo she” hello."],
+["木","き","tree; wood","n4","noun","The kanji looks like a tree."],
+["目的","もくてき","purpose","n4","noun","“Mokuteki” — imagine “mo ku tek ee” purpose."],
+["木曜日","もくようび","Thursday","n4","noun","“Mokuyoubi” — “moku” wood + “youbi” day."],
+["文字","もじ","character; letter","n4","noun","“Moji” — imagine “mo gee” character."],
+["もし","もし","if","n4","adverb","“Moshi” — imagine “mo she” if."],
+["持つ","もつ","to hold; to carry","n4","verb","“Motsu” — imagine “mots” hold."],
+["もっと","もっと","more","n4","adverb","“Motto” — imagine “mot toe” more."],
+["戻る","もどる","to return","n4","verb","“Modoru” — imagine “mo do roo” return."],
+["森","もり","forest","n4","noun","The kanji shows three trees — a forest."],
+["焼く","やく","to bake; to grill","n4","verb","“Yaku” — imagine “ya coo” bake."],
+["約束","やくそく","promise","n4","noun","“Yakusoku” — imagine “ya coo so coo” promise."],
+["役に立つ","やくにたつ","to be useful","n4","expression","“Yakunitatsu” — imagine “ya coo nee tat sue” useful."],
+["焼ける","やける","to be burned","n4","verb","“Yakeru” — from “yaku” (to burn)."],
+["優しい","やさしい","kind; gentle","n4","adjective","“Yasashii” — imagine “ya sa she” kind."],
+["安い","やすい","cheap","n4","adjective","“Yasui” — imagine “yes easy” cheap."],
+["雇う","やとう","to employ","n4","verb","“Yatou” — imagine “ya toe” employ."],
+["屋根","やね","roof","n4","noun","“Yane” — imagine “ya nay” roof."],
+["やはり","やはり","as expected","n4","adverb","“Yahari” — imagine “ya ha ree” as expected."],
+["止む","やむ","to stop (rain)","n4","verb","“Yamu” — imagine “ya moo” stop."],
+["止める","やめる","to stop; to quit","n4","verb","“Yameru” — imagine “ya may roo” quit."],
+["柔らかい","やわらかい","soft","n4","adjective","“Yawarakai” — imagine “ya wa ra kai” soft."],
+["湯","ゆ","hot water","n4","noun","“Yu” — imagine “you” in hot water."],
+["輸出","ゆしゅつ","export","n4","noun","“Yushutsu” — imagine “you shut sue” export."],
+["輸入","ゆにゅう","import","n4","noun","“Yunyuu” — imagine “you new” import."],
+["指","ゆび","finger","n4","noun","“Yubi” — imagine “you bee” finger."],
+["夢","ゆめ","dream","n4","noun","“Yume” — imagine “you may” dream."],
+["有名","ゆうめい","famous","n4","adjective","“Yuumei” — imagine “you may” famous."],
+["許す","ゆるす","to forgive","n4","verb","“Yurusu” — imagine “you roo sue” forgive."],
+["用意","ようい","preparation","n4","noun","“Youi” — imagine “yo ee” prepare."],
+["用事","ようじ","errand; business","n4","noun","“Youji” — imagine “yo gee” errand."],
+["汚れる","よごれる","to get dirty","n4","verb","“Yogoreru” — imagine “yo go reh roo” dirty."],
+["寄る","よる","to stop by","n4","verb","“Yoru” — imagine “yo roo” stop by."],
+["喜ぶ","よろこぶ","to be delighted","n4","verb","“Yorokobu” — imagine “yo ro ko boo” happy."],
+["理由","りゆう","reason","n4","noun","“Riyuu” — imagine “ree you” reason."],
+["利用","りよう","use; utilization","n4","noun","“Riyou” — imagine “ree yo” use."],
+["両方","りょうほう","both","n4","noun","“Ryouhou” — imagine “ryo ho” both."],
+["旅行","りょこう","travel","n4","noun","“Ryokou” — imagine “ryo ko” travel."],
+["留守","るす","absence from home","n4","noun","“Rusu” — imagine “roo sue” away."],
+["冷房","れいぼう","air conditioning","n4","noun","“Reibou” — imagine “ray bo” cooling."],
+["歴史","れきし","history","n4","noun","“Rekishi” — imagine “rek key she” history."],
+["連絡","れんらく","contact; communication","n4","noun","“Renraku” — imagine “ren ra ku” contact."],
+["廊下","ろうか","corridor","n4","noun","“Rouka” — imagine “row ka” corridor."],
+["若い","わかい","young","n4","adjective","“Wakai” — imagine “wa ka ee” young."],
+["別れる","わかれる","to part; to separate","n4","verb","“Wakareru” — imagine “wa ka reh roo” separate."],
+["沸く","わく","to boil","n4","verb","“Waku” — imagine “wa coo” boil."],
+["訳","わけ","reason; meaning","n4","noun","“Wake” — imagine “wa keh” reason."],
+["忘れる","わすれる","to forget","n4","verb","“Wasureru” — imagine “wa sue reh roo” forget."],
+["私","わたし","I; me","n4","noun","“Watashi” — imagine “wa ta she” me."],
+["渡す","わたす","to hand over","n4","verb","“Watasu” — imagine “wa ta sue” hand over."],
+["渡る","わたる","to cross","n4","verb","“Wataru” — imagine “wa ta roo” cross."],
+["笑う","わらう","to laugh","n4","verb","“Warau” — imagine “wa rao” laugh."],
+["割る","わる","to divide","n4","verb","“Waru” — imagine “wa roo” divide."],
+["悪い","わるい","bad","n4","adjective","“Warui” — imagine “war” bad."],
+["枠","わく","frame","n4","noun","“Waku” — imagine “wa coo” frame."],
+["湾","わん","bay","n4","noun","“Wan” — imagine “one” bay."],
+["アイスクリーム","アイスクリーム","ice cream","n4","noun","“Aisukuriimu” — sounds like “ice cream”."],
+["アフリカ","アフリカ","Africa","n4","noun","“Afurika” — sounds like “Africa”."],
+["アメリカ","アメリカ","America","n4","noun","“Amerika” — sounds like “America”."],
+["アルコール","アルコール","alcohol","n4","noun","“Arukooru” — sounds like “alcohol”."],
+["アルバイト","アルバイト","part-time job","n4","noun","“Arubaito” — from German “Arbeit” (work)."],
+["エスカレーター","エスカレーター","escalator","n4","noun","Sounds like “escalator”."],
+["カーテン","カーテン","curtain","n4","noun","Sounds like “curtain”."],
+["ガス","ガス","gas","n4","noun","Sounds like “gas”."],
+["ガソリン","ガソリン","gasoline","n4","noun","Sounds like “gasoline”."],
+["ガラス","ガラス","glass","n4","noun","Sounds like “glass”."],
+["カレー","カレー","curry","n4","noun","Sounds like “curry”."],
+["ケーキ","ケーキ","cake","n4","noun","Sounds like “cake”."],
+["コート","コート","coat","n4","noun","Sounds like “coat”."],
+["コーヒー","コーヒー","coffee","n4","noun","Sounds like “coffee”."],
+["コップ","コップ","cup; glass","n4","noun","Sounds like “cup”."],
+["コピー","コピー","copy","n4","noun","Sounds like “copy”."],
+["コンピューター","コンピューター","computer","n4","noun","Sounds like “computer”."],
+["サービス","サービス","service","n4","noun","Sounds like “service”."],
+["サッカー","サッカー","soccer","n4","noun","Sounds like “soccer”."],
+["シャツ","シャツ","shirt","n4","noun","Sounds like “shirt”."],
+["シャワー","シャワー","shower","n4","noun","Sounds like “shower”."],
+["スーパー","スーパー","supermarket","n4","noun","Short for “supermarket”."],
+["ステーキ","ステーキ","steak","n4","noun","Sounds like “steak”."],
+["ズボン","ズボン","trousers","n4","noun","From French “jupon” (skirt)."],
+["スポーツ","スポーツ","sport","n4","noun","Sounds like “sports”."],
+["セーター","セーター","sweater","n4","noun","Sounds like “sweater”."],
+["ゼロ","ゼロ","zero","n4","noun","Sounds like “zero”."],
+["ソフト","ソフト","soft; software","n4","noun","Sounds like “soft”."],
+["タイプ","タイプ","type","n4","noun","Sounds like “type”."],
+["タクシー","タクシー","taxi","n4","noun","Sounds like “taxi”."],
+["ダンス","ダンス","dance","n4","noun","Sounds like “dance”."],
+["チェック","チェック","check","n4","noun","Sounds like “check”."],
+["テキスト","テキスト","text; textbook","n4","noun","Sounds like “text”."],
+["テスト","テスト","test","n4","noun","Sounds like “test”."],
+["テニス","テニス","tennis","n4","noun","Sounds like “tennis”."],
+["デパート","デパート","department store","n4","noun","Short for “department store”."],
+["ドア","ドア","door","n4","noun","Sounds like “door”."],
+["トイレ","トイレ","toilet","n4","noun","Short for “toilet”."],
+["ナイフ","ナイフ","knife","n4","noun","Sounds like “knife”."],
+["ニュース","ニュース","news","n4","noun","Sounds like “news”."],
+["ネクタイ","ネクタイ","necktie","n4","noun","Sounds like “necktie”."],
+["ノート","ノート","notebook","n4","noun","Sounds like “note”."],
+["パーティー","パーティー","party","n4","noun","Sounds like “party”."],
+["バス","バス","bus","n4","noun","Sounds like “bus”."],
+["バター","バター","butter","n4","noun","Sounds like “butter”."],
+["パソコン","パソコン","personal computer","n4","noun","Short for “personal computer”."],
+["バナナ","バナナ","banana","n4","noun","Sounds like “banana”."],
+["ハンカチ","ハンカチ","handkerchief","n4","noun","Sounds like “handkerchief”."],
+["ビール","ビール","beer","n4","noun","Sounds like “beer”."],
+["ピアノ","ピアノ","piano","n4","noun","Sounds like “piano”."],
+["ビデオ","ビデオ","video","n4","noun","Sounds like “video”."],
+["プール","プール","pool","n4","noun","Sounds like “pool”."],
+["フォーク","フォーク","fork","n4","noun","Sounds like “fork”."],
+["プレゼント","プレゼント","present; gift","n4","noun","Sounds like “present”."],
+["ペン","ペン","pen","n4","noun","Sounds like “pen”."],
+["ボールペン","ボールペン","ballpoint pen","n4","noun","Sounds like “ballpoint pen”."],
+["ポケット","ポケット","pocket","n4","noun","Sounds like “pocket”."],
+["ホテル","ホテル","hotel","n4","noun","Sounds like “hotel”."],
+["メートル","メートル","metre","n4","noun","Sounds like “metre”."],
+["メニュー","メニュー","menu","n4","noun","Sounds like “menu”."],
+["ラジオ","ラジオ","radio","n4","noun","Sounds like “radio”."],
+["レストラン","レストラン","restaurant","n4","noun","Sounds like “restaurant”."],
+["レポート","レポート","report","n4","noun","Sounds like “report”."],
+["ワイシャツ","ワイシャツ","white shirt","n4","noun","From “white shirt”."]
+];
+
+/* =====================================================================
+   2. DATA: JLPT N5 + N4 GRAMMAR
+   Format: {pattern, level, meaning, structure, exampleJp, exampleEn, mnemonic, topic}
+   ===================================================================== */
+const grammar = [
+/* ---------- N5 GRAMMAR ---------- */
+{pattern:"〜は〜です",level:"n5",meaning:"A is B (topic marker + copula)",structure:"[noun] は [noun/adj] です",exampleJp:"私は学生です。",exampleEn:"I am a student.",mnemonic:"Think: は “wa” points to the topic — “As for me… I am a student.”",topic:"Copula"},
+{pattern:"〜じゃないです / 〜ではないです",level:"n5",meaning:"A is not B (negative copula)",structure:"[noun] は [noun/adj] じゃないです",exampleJp:"私は先生じゃないです。",exampleEn:"I am not a teacher.",mnemonic:"じゃない = “ja nai” — “not!” Add です for politeness.",topic:"Copula"},
+{pattern:"〜ですか",level:"n5",meaning:"Question marker (is it…?)",structure:"[sentence] か",exampleJp:"学生ですか。",exampleEn:"Are you a student?",mnemonic:"か (ka) is the question mark at the end — like a verbal question mark.",topic:"Questions"},
+{pattern:"〜ます / 〜ません",level:"n5",meaning:"Polite present/future verb form (do / don't do)",structure:"[verb stem] + ます / ません",exampleJp:"毎日日本語を勉強します。",exampleEn:"I study Japanese every day.",mnemonic:"ます = polite present. ません = polite negative. Think “masu = I do” / “masen = I don’t.”",topic:"Verbs"},
+{pattern:"〜ました / 〜ませんでした",level:"n5",meaning:"Polite past verb form (did / didn't do)",structure:"[verb stem] + ました / ませんでした",exampleJp:"昨日映画を見ました。",exampleEn:"I watched a movie yesterday.",mnemonic:"ました = past polite. ませんでした = past negative polite. “Mashita = did,” “masen deshita = didn’t.”",topic:"Verbs"},
+{pattern:"〜を",level:"n5",meaning:"Direct object marker",structure:"[noun] を [verb]",exampleJp:"本を読みます。",exampleEn:"I read a book.",mnemonic:"を (o) points to the thing you “do” the verb to. Think: “o” = object.",topic:"Particles"},
+{pattern:"〜に / 〜へ",level:"n5",meaning:"Direction / destination marker (to, toward)",structure:"[place] に / へ [motion verb]",exampleJp:"日本に行きます。",exampleEn:"I go to Japan.",mnemonic:"に (ni) = destination pin. へ (e) = “heading” toward.",topic:"Particles"},
+{pattern:"〜で",level:"n5",meaning:"Location of action / means (at, by, with)",structure:"[place] で [action verb] / [tool] で [verb]",exampleJp:"図書館で勉強します。",exampleEn:"I study at the library.",mnemonic:"で (de) = “where” the action happens or “what” you use. Think: “de = do it here.”",topic:"Particles"},
+{pattern:"〜と",level:"n5",meaning:"And (between nouns) / with (person)",structure:"[noun] と [noun] / [person] と [verb]",exampleJp:"友達と話します。",exampleEn:"I talk with a friend.",mnemonic:"と (to) = “together with” or “and.” Think: “to = together.”",topic:"Particles"},
+{pattern:"〜も",level:"n5",meaning:"Also; too",structure:"[noun] も",exampleJp:"私も行きます。",exampleEn:"I will go too.",mnemonic:"も (mo) = “more.” Think: “mo = me too!”",topic:"Particles"},
+{pattern:"〜の",level:"n5",meaning:"Possession / attribution (’s, of)",structure:"[noun] の [noun]",exampleJp:"これは私の本です。",exampleEn:"This is my book.",mnemonic:"の (no) = “of.” Think: “no = noun owner.”",topic:"Particles"},
+{pattern:"〜が",level:"n5",meaning:"Subject marker (new info / emphasis)",structure:"[subject] が [predicate]",exampleJp:"猫がいます。",exampleEn:"There is a cat.",mnemonic:"が (ga) = “got it!” — points to the subject that does the action.",topic:"Particles"},
+{pattern:"〜から〜まで",level:"n5",meaning:"From … to …",structure:"[start] から [end] まで",exampleJp:"9時から5時まで働きます。",exampleEn:"I work from 9 to 5.",mnemonic:"から (kara) = “from.” まで (made) = “until.” Think: “kara = start, made = end.”",topic:"Particles"},
+{pattern:"〜や〜など",level:"n5",meaning:"And … etc. (partial list)",structure:"[noun] や [noun] など",exampleJp:"りんごやバナナなどを買いました。",exampleEn:"I bought apples, bananas, etc.",mnemonic:"や (ya) = “and” (partial list). など (nado) = “etc.” Think: “ya = yada yada.”",topic:"Particles"},
+{pattern:"〜ている",level:"n5",meaning:"Ongoing action / resulting state",structure:"[te-form] + いる",exampleJp:"今、本を読んでいます。",exampleEn:"I am reading a book now.",mnemonic:"ている = “-ing.” Think: “te-iru = doing it now.”",topic:"Verbs"},
+{pattern:"〜てください",level:"n5",meaning:"Please do …",structure:"[te-form] + ください",exampleJp:"ちょっと待ってください。",exampleEn:"Please wait a moment.",mnemonic:"ください = “please.” Think: “kudasai = kindly do.”",topic:"Verbs"},
+{pattern:"〜てもいいです",level:"n5",meaning:"It is okay to do …",structure:"[te-form] + もいいです",exampleJp:"ここに座ってもいいですか。",exampleEn:"May I sit here?",mnemonic:"もいい = “also good” = permission. Think: “it’s okay.”",topic:"Verbs"},
+{pattern:"〜てはいけません",level:"n5",meaning:"You must not do …",structure:"[te-form] + はいけません",exampleJp:"ここで写真を撮ってはいけません。",exampleEn:"You must not take photos here.",mnemonic:"はいけません = “not allowed.” Think: “haikemasen = no way.”",topic:"Verbs"},
+{pattern:"〜ないでください",level:"n5",meaning:"Please don't do …",structure:"[nai-form] + でください",exampleJp:"心配しないでください。",exampleEn:"Please don’t worry.",mnemonic:"ないで = “don’t.” Think: “nai-de = not.”",topic:"Verbs"},
+{pattern:"い-adjectives: 〜い",level:"n5",meaning:"i-adjective present affirmative",structure:"[i-adj] + です",exampleJp:"この本は面白いです。",exampleEn:"This book is interesting.",mnemonic:"い-adjectives end in い. Add です for politeness.",topic:"Adjectives"},
+{pattern:"い-adjectives negative: 〜くない",level:"n5",meaning:"i-adjective negative",structure:"[i-adj stem] + くないです",exampleJp:"この本は面白くないです。",exampleEn:"This book is not interesting.",mnemonic:"Drop い, add くない. Think: “ku-nai = cool, not!”",topic:"Adjectives"},
+{pattern:"な-adjectives: 〜な",level:"n5",meaning:"na-adjective + noun / copula",structure:"[na-adj] + な + [noun] / [na-adj] + です",exampleJp:"静かな公園です。",exampleEn:"It is a quiet park.",mnemonic:"な-adjectives use な before nouns. Think: “na = noun glue.”",topic:"Adjectives"},
+{pattern:"〜が好きです / 〜が嫌いです",level:"n5",meaning:"I like / dislike …",structure:"[noun] が 好きです / 嫌いです",exampleJp:"犬が好きです。",exampleEn:"I like dogs.",mnemonic:"好き = “suki” = like. 嫌い = “kirai” = dislike. Think: “suki = I’m sweet on it.”",topic:"Adjectives"},
+{pattern:"〜が上手です / 〜が下手です",level:"n5",meaning:"Good at / bad at …",structure:"[noun] が 上手です / 下手です",exampleJp:"彼は日本語が上手です。",exampleEn:"He is good at Japanese.",mnemonic:"上手 = “jouzu” = skilled. 下手 = “heta” = unskilled. Think: “jouzu = job well done.”",topic:"Adjectives"},
+{pattern:"〜たいです",level:"n5",meaning:"Want to do …",structure:"[verb stem] + たいです",exampleJp:"日本に行きたいです。",exampleEn:"I want to go to Japan.",mnemonic:"たい = “tie” your desire. Think: “tai = I wanna!”",topic:"Desire"},
+{pattern:"〜がほしいです",level:"n5",meaning:"Want (a thing)",structure:"[noun] が ほしいです",exampleJp:"新しい車がほしいです。",exampleEn:"I want a new car.",mnemonic:"ほしい = “hoshii” = want. Think: “ho-she = I wish.”",topic:"Desire"},
+{pattern:"〜ましょう / 〜ましょうか",level:"n5",meaning:"Let's do … / Shall we do …?",structure:"[verb stem] + ましょう / ましょうか",exampleJp:"一緒に行きましょう。",exampleEn:"Let’s go together.",mnemonic:"ましょう = “let’s.” Think: “masho = move on!”",topic:"Invitations"},
+{pattern:"〜ませんか",level:"n5",meaning:"Won't you …? (invitation)",structure:"[verb stem] + ませんか",exampleJp:"お茶を飲みませんか。",exampleEn:"Won’t you have some tea?",mnemonic:"ませんか = polite invitation. Think: “masen ka = how about…?”",topic:"Invitations"},
+{pattern:"〜から (because)",level:"n5",meaning:"Because … (reason)",structure:"[reason] から [result]",exampleJp:"寒いから、コートを着ます。",exampleEn:"Because it’s cold, I’ll wear a coat.",mnemonic:"から = “because.” Think: “kara = cause.”",topic:"Conjunctions"},
+{pattern:"〜が (but)",level:"n5",meaning:"But; however",structure:"[clause] が [clause]",exampleJp:"日本語は難しいですが、面白いです。",exampleEn:"Japanese is difficult, but interesting.",mnemonic:"が (ga) = “but.” Think: “ga = gotcha, but…”",topic:"Conjunctions"},
+{pattern:"〜そして",level:"n5",meaning:"And then; and",structure:"[clause] そして [clause]",exampleJp:"朝ご飯を食べました。そして、学校へ行きました。",exampleEn:"I ate breakfast. And then, I went to school.",mnemonic:"そして = “and then.” Think: “so-shite = so, then.”",topic:"Conjunctions"},
+{pattern:"〜それから",level:"n5",meaning:"After that; and then",structure:"[clause] それから [clause]",exampleJp:"掃除しました。それから、洗濯しました。",exampleEn:"I cleaned. After that, I did laundry.",mnemonic:"それから = “after that.” Think: “sore kara = that, from there.”",topic:"Conjunctions"},
+
+/* ---------- N4 GRAMMAR ---------- */
+{pattern:"〜たことがある",level:"n4",meaning:"Have done … before (experience)",structure:"[ta-form] + ことがある",exampleJp:"富士山に登ったことがあります。",exampleEn:"I have climbed Mount Fuji before.",mnemonic:"こと = thing, ある = exists. Think: “the thing of having done = experience.”",topic:"Experience"},
+{pattern:"〜たばかり",level:"n4",meaning:"Just did … (recently)",structure:"[ta-form] + ばかり",exampleJp:"今、食べたばかりです。",exampleEn:"I just ate.",mnemonic:"ばかり = “just.” Think: “bakari = barely done.”",topic:"Time"},
+{pattern:"〜ながら",level:"n4",meaning:"While doing … (simultaneous)",structure:"[verb stem] + ながら",exampleJp:"音楽を聞きながら勉強します。",exampleEn:"I study while listening to music.",mnemonic:"ながら = “while.” Think: “nagara = nag and do.”",topic:"Time"},
+{pattern:"〜たら",level:"n4",meaning:"If / when … (conditional)",structure:"[ta-form] + ら",exampleJp:"雨が降ったら、行きません。",exampleEn:"If it rains, I won’t go.",mnemonic:"たら = “if/when.” Think: “tara = ta-da! condition.”",topic:"Conditionals"},
+{pattern:"〜ば",level:"n4",meaning:"If … (conditional)",structure:"[ba-form]",exampleJp:"安ければ、買います。",exampleEn:"If it’s cheap, I’ll buy it.",mnemonic:"ば = “if.” Think: “ba = bar set, then…”",topic:"Conditionals"},
+{pattern:"〜と",level:"n4",meaning:"If / when … (natural consequence)",structure:"[dictionary form] + と",exampleJp:"春になると、桜が咲きます。",exampleEn:"When spring comes, cherry blossoms bloom.",mnemonic:"と = “when.” Think: “to = automatically then.”",topic:"Conditionals"},
+{pattern:"〜なら",level:"n4",meaning:"If it’s the case that …",structure:"[noun/plain form] + なら",exampleJp:"日本に行くなら、京都がおすすめです。",exampleEn:"If you’re going to Japan, I recommend Kyoto.",mnemonic:"なら = “if that’s the case.” Think: “nara = now, if…”",topic:"Conditionals"},
+{pattern:"〜なければならない",level:"n4",meaning:"Must do …",structure:"[nai-form stem] + なければならない",exampleJp:"宿題をしなければなりません。",exampleEn:"I must do my homework.",mnemonic:"なければ = “if not,” ならない = “won’t do.” Think: “if not, it won’t work = must.”",topic:"Obligation"},
+{pattern:"〜なくてもいいです",level:"n4",meaning:"Don't have to do …",structure:"[nai-form stem] + なくてもいいです",exampleJp:"明日来なくてもいいです。",exampleEn:"You don’t have to come tomorrow.",mnemonic:"なくても = “even if not,” いい = “good.” Think: “not doing is okay.”",topic:"Obligation"},
+{pattern:"〜ほうがいいです",level:"n4",meaning:"It's better to do …",structure:"[ta-form / nai-form] + ほうがいいです",exampleJp:"早く寝たほうがいいです。",exampleEn:"You should go to bed early.",mnemonic:"ほう = “side.” Think: “this side is better.”",topic:"Advice"},
+{pattern:"〜てあげる / 〜てくれる / 〜てもらう",level:"n4",meaning:"Giving and receiving actions",structure:"[te-form] + あげる / くれる / もらう",exampleJp:"友達が本を貸してくれました。",exampleEn:"My friend lent me a book.",mnemonic:"あげる = I give, くれる = they give me, もらう = I receive. Think: “give / get / receive.”",topic:"Giving"},
+{pattern:"〜てしまう",level:"n4",meaning:"End up doing / finish doing (often regret)",structure:"[te-form] + しまう",exampleJp:"ケーキを全部食べてしまいました。",exampleEn:"I ended up eating the whole cake.",mnemonic:"しまう = “put away.” Think: “shimau = done and dusted (oops).”",topic:"Verbs"},
+{pattern:"〜てみる",level:"n4",meaning:"Try doing …",structure:"[te-form] + みる",exampleJp:"この料理を食べてみてください。",exampleEn:"Please try eating this dish.",mnemonic:"みる = “see.” Think: “te-miru = try and see.”",topic:"Verbs"},
+{pattern:"〜ておく",level:"n4",meaning:"Do in advance / leave as is",structure:"[te-form] + おく",exampleJp:"旅行の前にホテルを予約しておきます。",exampleEn:"I’ll book a hotel in advance before the trip.",mnemonic:"おく = “put.” Think: “te-oku = put in place beforehand.”",topic:"Verbs"},
+{pattern:"〜てある",level:"n4",meaning:"Has been done (resulting state)",structure:"[te-form] + ある",exampleJp:"窓が開けてあります。",exampleEn:"The window has been opened (and is open).",mnemonic:"ある = “exists.” Think: “te-aru = someone did it, and it remains.”",topic:"Verbs"},
+{pattern:"〜ているところ",level:"n4",meaning:"In the middle of doing …",structure:"[te-form] + いるところ",exampleJp:"今、食べているところです。",exampleEn:"I’m in the middle of eating now.",mnemonic:"ところ = “place/point.” Think: “at the point of doing.”",topic:"Verbs"},
+{pattern:"〜たところ",level:"n4",meaning:"Just did … (immediately after)",structure:"[ta-form] + ところ",exampleJp:"今、駅に着いたところです。",exampleEn:"I just arrived at the station.",mnemonic:"たところ = “just did.” Think: “ta-tokoro = at the point of just doing.”",topic:"Time"},
+{pattern:"〜ばかりでなく",level:"n4",meaning:"Not only … but also",structure:"[noun/plain form] + ばかりでなく",exampleJp:"彼は英語ばかりでなく、中国語も話せます。",exampleEn:"He can speak not only English but also Chinese.",mnemonic:"ばかり = “only,” でなく = “not.” Think: “not only.”",topic:"Conjunctions"},
+{pattern:"〜おかげで",level:"n4",meaning:"Thanks to …",structure:"[noun/plain form] + おかげで",exampleJp:"先生のおかげで、合格しました。",exampleEn:"Thanks to my teacher, I passed.",mnemonic:"おかげ = “shadow/favour.” Think: “under the shadow of help = thanks to.”",topic:"Reason"},
+{pattern:"〜せいで",level:"n4",meaning:"Because of … (negative)",structure:"[noun/plain form] + せいで",exampleJp:"雨のせいで、試合が中止になりました。",exampleEn:"Because of the rain, the match was cancelled.",mnemonic:"せい = “fault.” Think: “sei-de = blame it on.”",topic:"Reason"},
+{pattern:"〜ように",level:"n4",meaning:"So that / in order to",structure:"[dictionary/nai form] + ように",exampleJp:"忘れないようにメモします。",exampleEn:"I’ll take a note so I don’t forget.",mnemonic:"ように = “so that.” Think: “you-ni = aim for.”",topic:"Purpose"},
+{pattern:"〜ために",level:"n4",meaning:"For the sake of / because of",structure:"[noun の / dictionary form] + ために",exampleJp:"健康のために運動します。",exampleEn:"I exercise for my health.",mnemonic:"ため = “sake.” Think: “tame-ni = for the purpose of.”",topic:"Purpose"},
+{pattern:"〜のに",level:"n4",meaning:"Although / in spite of",structure:"[plain form] + のに",exampleJp:"一生懸命勉強したのに、試験に落ちました。",exampleEn:"Although I studied hard, I failed the exam.",mnemonic:"のに = “even though.” Think: “no-ni = no, but still.”",topic:"Conjunctions"},
+{pattern:"〜ので",level:"n4",meaning:"Because … (soft reason)",structure:"[plain form] + ので",exampleJp:"寒いので、窓を閉めます。",exampleEn:"Because it’s cold, I’ll close the window.",mnemonic:"ので = “because.” Think: “no-de = no doubt, because.”",topic:"Conjunctions"},
+{pattern:"〜し〜し",level:"n4",meaning:"And (listing multiple reasons)",structure:"[clause] し [clause] し",exampleJp:"安いし、美味しいし、よく行きます。",exampleEn:"It’s cheap, and it’s delicious, so I go often.",mnemonic:"し = “and what’s more.” Think: “shi = she said, and… and…”",topic:"Conjunctions"},
+{pattern:"〜そうです (hearsay)",level:"n4",meaning:"I heard that …",structure:"[plain form] + そうです",exampleJp:"明日は雨だそうです。",exampleEn:"I heard it will rain tomorrow.",mnemonic:"そう = “it seems/hearsay.” Think: “so desu = so they say.”",topic:"Inference"},
+{pattern:"〜ようです",level:"n4",meaning:"It seems like … (based on evidence)",structure:"[plain form] + ようです",exampleJp:"彼は疲れているようです。",exampleEn:"He seems to be tired.",mnemonic:"よう = “appearance.” Think: “you-desu = looks like.”",topic:"Inference"},
+{pattern:"〜みたいです",level:"n4",meaning:"Looks like / seems like",structure:"[noun/plain form] + みたいです",exampleJp:"雨が降っているみたいです。",exampleEn:"It looks like it’s raining.",mnemonic:"みたい = “like.” Think: “mitai = it seems.”",topic:"Inference"},
+{pattern:"〜らしいです",level:"n4",meaning:"Apparently / seems like",structure:"[noun/plain form] + らしいです",exampleJp:"彼は来ないらしいです。",exampleEn:"Apparently he’s not coming.",mnemonic:"らしい = “apparently.” Think: “rashii = reportedly.”",topic:"Inference"},
+{pattern:"〜かもしれません",level:"n4",meaning:"Might / maybe",structure:"[plain form] + かもしれません",exampleJp:"明日は雪かもしれません。",exampleEn:"It might snow tomorrow.",mnemonic:"かも = “maybe.” Think: “kamo = perhaps.”",topic:"Inference"},
+{pattern:"〜はずです",level:"n4",meaning:"Should be / supposed to be",structure:"[plain form] + はずです",exampleJp:"彼はもう着いているはずです。",exampleEn:"He should have arrived already.",mnemonic:"はず = “expectation.” Think: “hazu = should be.”",topic:"Inference"},
+{pattern:"〜つもりです",level:"n4",meaning:"Intend to …",structure:"[dictionary form] + つもりです",exampleJp:"来年日本に行くつもりです。",exampleEn:"I intend to go to Japan next year.",mnemonic:"つもり = “intention.” Think: “tsumori = I’m planning.”",topic:"Intention"},
+{pattern:"〜予定です",level:"n4",meaning:"Is scheduled / planned to …",structure:"[dictionary form / noun の] + 予定です",exampleJp:"来週旅行する予定です。",exampleEn:"I’m scheduled to travel next week.",mnemonic:"予定 = “schedule.” Think: “yotei = plan.”",topic:"Intention"},
+{pattern:"〜ことになる",level:"n4",meaning:"It has been decided that …",structure:"[dictionary/nai form] + ことになる",exampleJp:"来月大阪に転勤することになりました。",exampleEn:"It has been decided that I’ll transfer to Osaka next month.",mnemonic:"ことになる = “it becomes a thing.” Think: “a decision was made.”",topic:"Decision"},
+{pattern:"〜ことにする",level:"n4",meaning:"I have decided to …",structure:"[dictionary/nai form] + ことにする",exampleJp:"毎日運動することにしました。",exampleEn:"I have decided to exercise every day.",mnemonic:"ことにする = “I make it a thing.” Think: “I decide.”",topic:"Decision"},
+{pattern:"〜ようにする",level:"n4",meaning:"Make an effort to …",structure:"[dictionary/nai form] + ようにする",exampleJp:"野菜を食べるようにしています。",exampleEn:"I try to eat vegetables.",mnemonic:"ようにする = “do in the direction of.” Think: “make it a habit.”",topic:"Effort"},
+{pattern:"〜ようになる",level:"n4",meaning:"Come to be able to … / reach a state",structure:"[dictionary/nai form] + ようになる",exampleJp:"日本語が話せるようになりました。",exampleEn:"I’ve become able to speak Japanese.",mnemonic:"ようになる = “become the state of.” Think: “you-ni naru = grow into.”",topic:"Change"},
+{pattern:"〜こと",level:"n4",meaning:"Nominaliser (turning verb into noun)",structure:"[dictionary form] + こと",exampleJp:"趣味は本を読むことです。",exampleEn:"My hobby is reading books.",mnemonic:"こと = “thing.” Think: “koto = abstract thing.”",topic:"Nominalisation"},
+{pattern:"〜の",level:"n4",meaning:"Nominaliser (casual / sensory)",structure:"[dictionary form] + の",exampleJp:"音楽を聞くのが好きです。",exampleEn:"I like listening to music.",mnemonic:"の = “one/thing.” Think: “no = the act of.”",topic:"Nominalisation"},
+{pattern:"〜という",level:"n4",meaning:"Called / named / that …",structure:"[noun] という [noun]",exampleJp:"これは「さくら」という花です。",exampleEn:"This is a flower called “Japanese.”",mnemonic:"という = “called.” Think: “to-iu = they say/name.”",topic:"Description"},
+{pattern:"〜とか〜とか",level:"n4",meaning:"Things like … and …",structure:"[noun] とか [noun] とか",exampleJp:"果物とか野菜とかを買いました。",exampleEn:"I bought fruits, vegetables, and such.",mnemonic:"とか = “things like.” Think: “to-ka = or something.”",topic:"Listing"},
+{pattern:"〜だけでなく",level:"n4",meaning:"Not only … but also",structure:"[noun/plain form] + だけでなく",exampleJp:"英語だけでなく、フランス語も話せます。",exampleEn:"I can speak not only English but also French.",mnemonic:"だけ = “only,” でなく = “not.” Think: “not only.”",topic:"Conjunctions"},
+{pattern:"〜くらい / 〜ぐらい",level:"n4",meaning:"About / approximately",structure:"[quantity] くらい / ぐらい",exampleJp:"10分ぐらい待ってください。",exampleEn:"Please wait about 10 minutes.",mnemonic:"ぐらい = “about.” Think: “gurai = roughly.”",topic:"Approximation"},
+{pattern:"〜ほど",level:"n4",meaning:"To the extent of / degree",structure:"[noun/plain form] + ほど",exampleJp:"死ぬほど疲れました。",exampleEn:"I’m tired to death.",mnemonic:"ほど = “extent.” Think: “hodo = as far as.”",topic:"Degree"},
+{pattern:"〜しか〜ない",level:"n4",meaning:"Only / nothing but",structure:"[noun] しか + [negative verb]",exampleJp:"水しかありません。",exampleEn:"There is only water.",mnemonic:"しか = “only.” Think: “shika + nai = nothing but.”",topic:"Limitation"},
+{pattern:"〜ずつ",level:"n4",meaning:"Each / at a time",structure:"[quantity] ずつ",exampleJp:"一人ずつ来てください。",exampleEn:"Please come one at a time.",mnemonic:"ずつ = “each.” Think: “zutsu = step by step.”",topic:"Distribution"},
+{pattern:"〜おきに",level:"n4",meaning:"Every (interval)",structure:"[quantity] おきに",exampleJp:"10分おきにバスが来ます。",exampleEn:"The bus comes every 10 minutes.",mnemonic:"おき = “interval.” Think: “oki = set it and repeat.”",topic:"Interval"},
+{pattern:"〜ぶりに",level:"n4",meaning:"For the first time in …",structure:"[period] ぶりに",exampleJp:"3年ぶりに日本に帰りました。",exampleEn:"I returned to Japan for the first time in 3 years.",mnemonic:"ぶり = “interval.” Think: “buri = gap.”",topic:"Time"},
+{pattern:"〜までに",level:"n4",meaning:"By (a deadline)",structure:"[time] までに",exampleJp:"5時までに来てください。",exampleEn:"Please come by 5 o’clock.",mnemonic:"まで = “until,” に = “by.” Think: “by the deadline.”",topic:"Time"},
+{pattern:"〜間に",level:"n4",meaning:"During / while (a period)",structure:"[noun の / te-form] 間に",exampleJp:"夏休みの間に、旅行しました。",exampleEn:"I travelled during summer vacation.",mnemonic:"間 = “interval.” Think: “aida = between/while.”",topic:"Time"},
+{pattern:"〜うちに",level:"n4",meaning:"While / before (it changes)",structure:"[plain form / noun の] うちに",exampleJp:"若いうちに、たくさん旅行したいです。",exampleEn:"I want to travel a lot while I’m young.",mnemonic:"うち = “inside/while.” Think: “uchi-ni = while you still can.”",topic:"Time"},
+{pattern:"〜てから",level:"n4",meaning:"After doing …",structure:"[te-form] + から",exampleJp:"食べてから、出かけます。",exampleEn:"After eating, I’ll go out.",mnemonic:"てから = “after.” Think: “te-kara = from that point.”",topic:"Sequence"},
+{pattern:"〜前に",level:"n4",meaning:"Before doing …",structure:"[dictionary form] + 前に",exampleJp:"寝る前に、歯を磨きます。",exampleEn:"I brush my teeth before going to bed.",mnemonic:"前に = “before.” Think: “mae-ni = in front of.”",topic:"Sequence"},
+{pattern:"〜後で",level:"n4",meaning:"After doing …",structure:"[noun の / ta-form] + 後で",exampleJp:"仕事の後で、映画を見ます。",exampleEn:"After work, I’ll watch a movie.",mnemonic:"後で = “after.” Think: “ato-de = later.”",topic:"Sequence"},
+{pattern:"〜始める",level:"n4",meaning:"Start doing …",structure:"[verb stem] + 始める",exampleJp:"日本語を勉強し始めました。",exampleEn:"I started studying Japanese.",mnemonic:"始める = “begin.” Think: “hajimeru = start.”",topic:"Verbs"},
+{pattern:"〜終わる",level:"n4",meaning:"Finish doing …",structure:"[verb stem] + 終わる",exampleJp:"本を読み終わりました。",exampleEn:"I finished reading the book.",mnemonic:"終わる = “end.” Think: “owaru = over.”",topic:"Verbs"},
+{pattern:"〜続ける",level:"n4",meaning:"Continue doing …",structure:"[verb stem] + 続ける",exampleJp:"毎日走り続けています。",exampleEn:"I continue running every day.",mnemonic:"続ける = “continue.” Think: “tsuzukeru = keep on.”",topic:"Verbs"},
+{pattern:"〜出す",level:"n4",meaning:"Suddenly start doing …",structure:"[verb stem] + 出す",exampleJp:"突然泣き出しました。",exampleEn:"She suddenly started crying.",mnemonic:"出す = “take out.” Think: “dasu = burst out.”",topic:"Verbs"},
+{pattern:"〜直す",level:"n4",meaning:"Redo / do again",structure:"[verb stem] + 直す",exampleJp:"間違えたので、やり直します。",exampleEn:"I made a mistake, so I’ll redo it.",mnemonic:"直す = “fix.” Think: “naosu = re-do.”",topic:"Verbs"},
+{pattern:"〜合う",level:"n4",meaning:"Do together / mutually",structure:"[verb stem] + 合う",exampleJp:"お互いに助け合いましょう。",exampleEn:"Let’s help each other.",mnemonic:"合う = “fit/meet.” Think: “au = together.”",topic:"Verbs"},
+{pattern:"〜やすい / 〜にくい",level:"n4",meaning:"Easy to do / hard to do",structure:"[verb stem] + やすい / にくい",exampleJp:"この本は読みやすいです。",exampleEn:"This book is easy to read.",mnemonic:"やすい = “easy,” にくい = “difficult.” Think: “yasui = yes, easy.”",topic:"Adjectives"},
+{pattern:"〜すぎる",level:"n4",meaning:"Too much / excessively",structure:"[verb stem / adj stem] + すぎる",exampleJp:"食べすぎました。",exampleEn:"I ate too much.",mnemonic:"すぎる = “exceed.” Think: “sugiru = too much.”",topic:"Degree"},
+{pattern:"〜がる",level:"n4",meaning:"Shows signs of / seems to want",structure:"[adj stem] + がる",exampleJp:"子供が怖がっています。",exampleEn:"The child is showing fear.",mnemonic:"がる = “shows signs.” Think: “garu = acting like.”",topic:"Adjectives"},
+{pattern:"〜がち",level:"n4",meaning:"Tend to / apt to",structure:"[verb stem / noun] + がち",exampleJp:"彼は病気がちです。",exampleEn:"He is prone to illness.",mnemonic:"がち = “tendency.” Think: “gachi = prone to.”",topic:"Tendency"},
+{pattern:"〜気味",level:"n4",meaning:"Slightly / a touch of",structure:"[verb stem / noun] + 気味",exampleJp:"少し疲れ気味です。",exampleEn:"I’m feeling a bit tired.",mnemonic:"気味 = “sensation.” Think: “gimi = a touch of.”",topic:"Tendency"},
+{pattern:"〜っぽい",level:"n4",meaning:"-ish / resembling",structure:"[noun / verb stem] + っぽい",exampleJp:"彼は子供っぽいです。",exampleEn:"He is childish.",mnemonic:"っぽい = “-ish.” Think: “ppoi = looks like.”",topic:"Description"},
+{pattern:"〜らしい",level:"n4",meaning:"Typical of / characteristic",structure:"[noun] + らしい",exampleJp:"彼は男らしいです。",exampleEn:"He is manly.",mnemonic:"らしい = “typical of.” Think: “rashii = just like.”",topic:"Description"},
+{pattern:"〜みたい",level:"n4",meaning:"Like / similar to",structure:"[noun/plain form] + みたい",exampleJp:"彼は子供みたいです。",exampleEn:"He is like a child.",mnemonic:"みたい = “like.” Think: “mitai = similar.”",topic:"Description"},
+{pattern:"〜ぶり",level:"n4",meaning:"Manner / way of doing",structure:"[verb stem] + ぶり",exampleJp:"彼の話しぶりは丁寧です。",exampleEn:"His way of speaking is polite.",mnemonic:"ぶり = “manner.” Think: “buri = style.”",topic:"Description"},
+{pattern:"〜おわり",level:"n4",meaning:"End of / finishing",structure:"[noun] + おわり",exampleJp:"映画のおわりは悲しかったです。",exampleEn:"The end of the movie was sad.",mnemonic:"おわり = “end.” Think: “owari = over.”",topic:"Description"},
+{pattern:"〜はじめ",level:"n4",meaning:"Beginning of / start",structure:"[noun] + はじめ",exampleJp:"月のはじめは忙しいです。",exampleEn:"The beginning of the month is busy.",mnemonic:"はじめ = “beginning.” Think: “hajime = start.”",topic:"Description"},
+{pattern:"〜ちゅう",level:"n4",meaning:"During / in the middle of",structure:"[noun] + 中 (ちゅう)",exampleJp:"会議中です。",exampleEn:"I’m in a meeting.",mnemonic:"中 = “middle.” Think: “chuu = during.”",topic:"Time"},
+{pattern:"〜じゅう",level:"n4",meaning:"Throughout / all over",structure:"[noun] + 中 (じゅう)",exampleJp:"一日中勉強しました。",exampleEn:"I studied all day.",mnemonic:"中 = “throughout.” Think: “juu = whole.”",topic:"Time"},
+{pattern:"〜ごろ",level:"n4",meaning:"Around (time)",structure:"[time] + ごろ",exampleJp:"6時ごろに帰ります。",exampleEn:"I’ll return around 6 o’clock.",mnemonic:"ごろ = “around.” Think: “goro = roughly.”",topic:"Time"},
+{pattern:"〜くらい (degree)",level:"n4",meaning:"To the extent that",structure:"[plain form] + くらい",exampleJp:"泣きたいくらい嬉しいです。",exampleEn:"I’m so happy I could cry.",mnemonic:"くらい = “extent.” Think: “kurai = so much that.”",topic:"Degree"},
+{pattern:"〜ほど (degree)",level:"n4",meaning:"So … that",structure:"[plain form] + ほど",exampleJp:"歩けないほど疲れました。",exampleEn:"I’m so tired I can’t walk.",mnemonic:"ほど = “extent.” Think: “hodo = to the point of.”",topic:"Degree"},
+{pattern:"〜ば〜ほど",level:"n4",meaning:"The more … the more …",structure:"[ba-form] + [dictionary form] + ほど",exampleJp:"練習すればするほど上手になります。",exampleEn:"The more you practise, the better you get.",mnemonic:"ば〜ほど = “the more…the more.” Think: “ba-hodo = as much as.”",topic:"Degree"},
+{pattern:"〜ないと",level:"n4",meaning:"Must / if not …",structure:"[nai-form] + と",exampleJp:"早く寝ないと。",exampleEn:"I must go to bed early.",mnemonic:"ないと = “if not.” Think: “nai-to = must.”",topic:"Obligation"},
+{pattern:"〜なきゃ",level:"n4",meaning:"Must (casual)",structure:"[nai-form stem] + きゃ",exampleJp:"宿題をやらなきゃ。",exampleEn:"I gotta do my homework.",mnemonic:"なきゃ = casual “must.” Think: “nakya = gotta.”",topic:"Obligation"},
+{pattern:"〜なさい",level:"n4",meaning:"Do … (command to a child)",structure:"[verb stem] + なさい",exampleJp:"早く寝なさい。",exampleEn:"Go to bed early.",mnemonic:"なさい = “do it.” Think: “nasai = now!”",topic:"Commands"},
+{pattern:"〜な",level:"n4",meaning:"Don't … (casual prohibition)",structure:"[dictionary form] + な",exampleJp:"触るな！",exampleEn:"Don’t touch!",mnemonic:"な = “don’t.” Think: “na = no!”",topic:"Commands"},
+{pattern:"〜ましょうか",level:"n4",meaning:"Shall I / shall we …?",structure:"[verb stem] + ましょうか",exampleJp:"荷物を持ちましょうか。",exampleEn:"Shall I carry your luggage?",mnemonic:"ましょうか = “shall I?” Think: “masho-ka = offer.”",topic:"Offers"},
+{pattern:"〜てくれませんか",level:"n4",meaning:"Could you please …?",structure:"[te-form] + くれませんか",exampleJp:"ちょっと手伝ってくれませんか。",exampleEn:"Could you help me a bit?",mnemonic:"くれませんか = “won’t you give me.” Think: “polite request.”",topic:"Requests"},
+{pattern:"〜ていただけませんか",level:"n4",meaning:"Could you kindly …? (very polite)",structure:"[te-form] + いただけませんか",exampleJp:"案内していただけませんか。",exampleEn:"Could you kindly guide me?",mnemonic:"いただけませんか = “could I humbly receive.” Think: “very polite ask.”",topic:"Requests"},
+{pattern:"〜させていただきます",level:"n4",meaning:"I will humbly do … (humble)",structure:"[causative te-form] + いただきます",exampleJp:"説明させていただきます。",exampleEn:"Allow me to explain.",mnemonic:"させていただきます = humble permission. Think: “may I please.”",topic:"Humble"},
+{pattern:"〜ております",level:"n4",meaning:"Am doing … (humble progressive)",structure:"[te-form] + おります",exampleJp:"現在、準備しております。",exampleEn:"I am currently preparing.",mnemonic:"おります = humble “am.” Think: “orimasu = I humbly am.”",topic:"Humble"},
+{pattern:"〜でございます",level:"n4",meaning:"Is / am (very polite copula)",structure:"[noun] + でございます",exampleJp:"こちらが受付でございます。",exampleEn:"This is the reception.",mnemonic:"でございます = ultra-polite “is.” Think: “gozaimasu = most respectful.”",topic:"Polite"},
+{pattern:"〜いかがですか",level:"n4",meaning:"How about …? (polite)",structure:"[noun] + いかがですか",exampleJp:"お茶はいかがですか。",exampleEn:"How about some tea?",mnemonic:"いかが = “how.” Think: “ikaga = how about.”",topic:"Offers"},
+{pattern:"〜そうだ (appearance)",level:"n4",meaning:"Looks like / appears to be",structure:"[adj stem / verb stem] + そうだ",exampleJp:"このケーキは美味しそうです。",exampleEn:"This cake looks delicious.",mnemonic:"そう = “looks like.” Think: “so-da = appears.”",topic:"Inference"},
+{pattern:"〜てほしい",level:"n4",meaning:"I want you to …",structure:"[te-form] + ほしい",exampleJp:"もっと早く来てほしいです。",exampleEn:"I want you to come earlier.",mnemonic:"てほしい = “want you to.” Think: “te-hoshii = I wish you would.”",topic:"Desire"},
+{pattern:"〜ないでほしい",level:"n4",meaning:"I want you not to …",structure:"[nai-form] + でほしい",exampleJp:"心配しないでほしいです。",exampleEn:"I want you not to worry.",mnemonic:"ないでほしい = “want you not to.” Think: “don’t, please.”",topic:"Desire"},
+{pattern:"〜ようと思う",level:"n4",meaning:"I think I'll … / I'm thinking of …",structure:"[volitional form] + と思う",exampleJp:"明日早く起きようと思います。",exampleEn:"I think I’ll get up early tomorrow.",mnemonic:"ようと思う = “I think I’ll.” Think: “yoo-to-omou = planning.”",topic:"Intention"},
+{pattern:"〜ようとしない",level:"n4",meaning:"Won't try to …",structure:"[volitional form] + としない",exampleJp:"彼は話そうとしません。",exampleEn:"He won’t try to speak.",mnemonic:"ようとしない = “won’t attempt.” Think: “refuses to try.”",topic:"Intention"},
+{pattern:"〜ことになっている",level:"n4",meaning:"It is a rule / custom that …",structure:"[dictionary/nai form] + ことになっている",exampleJp:"ここでは靴を脱ぐことになっています。",exampleEn:"Here, it is the rule to take off your shoes.",mnemonic:"ことになっている = “it has become a thing.” Think: “established rule.”",topic:"Rules"},
+{pattern:"〜ようにしている",level:"n4",meaning:"Make it a habit to …",structure:"[dictionary/nai form] + ようにしている",exampleJp:"毎日野菜を食べるようにしています。",exampleEn:"I make it a habit to eat vegetables daily.",mnemonic:"ようにしている = “doing in the direction of.” Think: “I try to make a habit.”",topic:"Habits"},
+{pattern:"〜ように言う",level:"n4",meaning:"Tell someone to …",structure:"[dictionary/nai form] + ように言う",exampleJp:"先生は静かにするように言いました。",exampleEn:"The teacher told us to be quiet.",mnemonic:"ように言う = “say to do.” Think: “instruct.”",topic:"Commands"},
+{pattern:"〜ように頼む",level:"n4",meaning:"Ask someone to …",structure:"[dictionary/nai form] + ように頼む",exampleJp:"友達に手伝うように頼みました。",exampleEn:"I asked my friend to help.",mnemonic:"ように頼む = “ask to do.” Think: “request.”",topic:"Requests"},
+{pattern:"〜ようにする",level:"n4",meaning:"Try to / make sure to …",structure:"[dictionary/nai form] + ようにする",exampleJp:"遅れないようにしてください。",exampleEn:"Please try not to be late.",mnemonic:"ようにする = “do so that.” Think: “make an effort.”",topic:"Effort"},
+{pattern:"〜ようになる",level:"n4",meaning:"Become able to / come to …",structure:"[dictionary/nai form] + ようになる",exampleJp:"日本語が読めるようになりました。",exampleEn:"I’ve become able to read Japanese.",mnemonic:"ようになる = “become the state of.” Think: “grow into.”",topic:"Change"},
+{pattern:"〜ことになる",level:"n4",meaning:"It turns out that / has been decided",structure:"[dictionary/nai form] + ことになる",exampleJp:"来月結婚することになりました。",exampleEn:"It has been decided that I’ll get married next month.",mnemonic:"ことになる = “it becomes a thing.” Think: “decision made.”",topic:"Decision"},
+{pattern:"〜ことにする",level:"n4",meaning:"I decide to …",structure:"[dictionary/nai form] + ことにする",exampleJp:"毎日運動することにしました。",exampleEn:"I decided to exercise every day.",mnemonic:"ことにする = “I make it a thing.” Think: “my decision.”",topic:"Decision"},
+{pattern:"〜ことにしている",level:"n4",meaning:"I make it a rule to …",structure:"[dictionary/nai form] + ことにしている",exampleJp:"朝は必ず新聞を読むことにしています。",exampleEn:"I make it a rule to read the newspaper every morning.",mnemonic:"ことにしている = “established as a thing.” Think: “my rule.”",topic:"Habits"},
+{pattern:"〜ことはない",level:"n4",meaning:"There is no need to …",structure:"[dictionary form] + ことはない",exampleJp:"心配することはありません。",exampleEn:"There’s no need to worry.",mnemonic:"ことはない = “there is no thing.” Think: “no need.”",topic:"Advice"},
+{pattern:"〜ことは〜が",level:"n4",meaning:"It is true that … but",structure:"[clause] ことは [clause] が",exampleJp:"美味しいことは美味しいですが、高いです。",exampleEn:"It is true that it’s delicious, but it’s expensive.",mnemonic:"ことは…が = “it is … but.” Think: “granted, however.”",topic:"Conjunctions"},
+{pattern:"〜ないことはない",level:"n4",meaning:"It's not that … isn't / it is possible",structure:"[nai-form] + ことはない",exampleJp:"行けないことはないですが、遠いです。",exampleEn:"It’s not that I can’t go, but it’s far.",mnemonic:"ないことはない = “not that it isn’t.” Think: “double negative = maybe.”",topic:"Nuance"},
+{pattern:"〜ないこともない",level:"n4",meaning:"It's not impossible to …",structure:"[nai-form] + こともない",exampleJp:"食べないこともないですが、好きじゃないです。",exampleEn:"It’s not that I don’t eat it, but I don’t like it.",mnemonic:"ないこともない = “not that I don’t.” Think: “sort of possible.”",topic:"Nuance"},
+{pattern:"〜とは限らない",level:"n4",meaning:"Not necessarily …",structure:"[plain form] + とは限らない",exampleJp:"高いものが良いとは限りません。",exampleEn:"Expensive things are not necessarily good.",mnemonic:"とは限らない = “not limited to.” Think: “not always.”",topic:"Nuance"},
+{pattern:"〜かもしれない",level:"n4",meaning:"Might / perhaps",structure:"[plain form] + かもしれない",exampleJp:"彼はもう帰ったかもしれません。",exampleEn:"He might have already gone home.",mnemonic:"かもしれない = “maybe.” Think: “kamo = could be.”",topic:"Inference"},
+{pattern:"〜に違いない",level:"n4",meaning:"Must be / without doubt",structure:"[plain form] + に違いない",exampleJp:"彼は犯人に違いありません。",exampleEn:"He must be the culprit.",mnemonic:"に違いない = “no mistake.” Think: “certainly must be.”",topic:"Inference"},
+{pattern:"〜はずがない",level:"n4",meaning:"Cannot be / impossible",structure:"[plain form] + はずがない",exampleJp:"彼が嘘をつくはずがありません。",exampleEn:"He cannot possibly lie.",mnemonic:"はずがない = “there’s no expectation.” Think: “impossible.”",topic:"Inference"},
+{pattern:"〜わけがない",level:"n4",meaning:"There's no way …",structure:"[plain form] + わけがない",exampleJp:"そんなことができるわけがありません。",exampleEn:"There’s no way I can do that.",mnemonic:"わけがない = “no reason.” Think: “no way.”",topic:"Inference"},
+{pattern:"〜わけではない",level:"n4",meaning:"It's not that …",structure:"[plain form] + わけではない",exampleJp:"嫌いなわけではありません。",exampleEn:"It’s not that I dislike it.",mnemonic:"わけではない = “it’s not the reason.” Think: “not necessarily.”",topic:"Nuance"},
+{pattern:"〜というわけだ",level:"n4",meaning:"That means / so it is that …",structure:"[plain form] + というわけだ",exampleJp:"つまり、行かないというわけですね。",exampleEn:"In other words, it means you’re not going.",mnemonic:"というわけだ = “that’s the reason.” Think: “so that means.”",topic:"Explanation"},
+{pattern:"〜というより",level:"n4",meaning:"Rather than / more like …",structure:"[noun/plain form] + というより",exampleJp:"彼は先生というより、友達です。",exampleEn:"He is more like a friend than a teacher.",mnemonic:"というより = “rather than.” Think: “more accurately.”",topic:"Nuance"},
+{pattern:"〜というと",level:"n4",meaning:"Speaking of / when you say …",structure:"[noun] + というと",exampleJp:"日本というと、桜を思い出します。",exampleEn:"Speaking of Japan, I think of cherry blossoms.",mnemonic:"というと = “speaking of.” Think: “when you say.”",topic:"Topic"},
+{pattern:"〜といえば",level:"n4",meaning:"Speaking of …",structure:"[noun] + といえば",exampleJp:"春といえば、桜です。",exampleEn:"Speaking of spring, it’s cherry blossoms.",mnemonic:"といえば = “if you say.” Think: “that reminds me.”",topic:"Topic"},
+{pattern:"〜なんか / 〜なんて",level:"n4",meaning:"Things like / such as (casual, dismissive)",structure:"[noun/plain form] + なんか",exampleJp:"お金なんか要りません。",exampleEn:"I don’t need things like money.",mnemonic:"なんか = “things like.” Think: “nanka = kinda.”",topic:"Nuance"},
+{pattern:"〜こそ",level:"n4",meaning:"Emphasis: precisely, exactly",structure:"[noun] + こそ",exampleJp:"今年こそ合格します。",exampleEn:"This year, for sure, I’ll pass.",mnemonic:"こそ = “precisely.” Think: “koso = THIS one.”",topic:"Emphasis"},
+{pattern:"〜さえ",level:"n4",meaning:"Even",structure:"[noun] + さえ",exampleJp:"子供でさえ知っています。",exampleEn:"Even a child knows.",mnemonic:"さえ = “even.” Think: “sae = at least.”",topic:"Emphasis"},
+{pattern:"〜でも",level:"n4",meaning:"Even / or something",structure:"[noun] + でも",exampleJp:"お茶でも飲みませんか。",exampleEn:"Would you like some tea or something?",mnemonic:"でも = “even/or.” Think: “demo = such as.”",topic:"Emphasis"},
+{pattern:"〜まで (even)",level:"n4",meaning:"Even / as far as",structure:"[noun] + まで",exampleJp:"彼は嘘までつきました。",exampleEn:"He even told a lie.",mnemonic:"まで = “even.” Think: “made = as far as.”",topic:"Emphasis"},
+{pattern:"〜だけあって",level:"n4",meaning:"As expected of / befitting",structure:"[plain form] + だけあって",exampleJp:"さすがプロだけあって、上手です。",exampleEn:"As expected of a pro, they’re skilled.",mnemonic:"だけあって = “only because.” Think: “befitting.”",topic:"Reason"},
+{pattern:"〜おかげで",level:"n4",meaning:"Thanks to",structure:"[noun/plain form] + おかげで",exampleJp:"先生のおかげで、合格しました。",exampleEn:"Thanks to my teacher, I passed.",mnemonic:"おかげで = “thanks to.” Think: “under the favour of.”",topic:"Reason"},
+{pattern:"〜せいで",level:"n4",meaning:"Because of (negative)",structure:"[noun/plain form] + せいで",exampleJp:"雨のせいで、遅れました。",exampleEn:"Because of the rain, I was late.",mnemonic:"せいで = “blame.” Think: “fault of.”",topic:"Reason"},
+{pattern:"〜おかげさまで",level:"n4",meaning:"Thanks to you / fortunately",structure:"〜おかげさまで",exampleJp:"おかげさまで、元気です。",exampleEn:"Thanks to you, I’m well.",mnemonic:"おかげさまで = “thanks to you.” Think: “grateful.”",topic:"Reason"}
+];
+
+/* =====================================================================
+   3. MNEMONIC TECHNIQUES
+   ===================================================================== */
+const mnemonicTechniques = [
+{icon:"🔗",title:"Sound Association",desc:"Link the Japanese sound to an English word or image that sounds similar. The stranger the link, the stronger the memory.",example:"“Arigatou” (thank you) → imagine “a rigid toe” bowing to say thanks.",tag:"Vocabulary"},
+{icon:"🎬",title:"Story Mnemonic",desc:"Create a vivid mini-story around the word. Stories are easier to recall than isolated facts because your brain remembers narratives.",example:"“Benkyou” (study) → a “bento box” full of books, eating knowledge for lunch.",tag:"Vocabulary"},
+{icon:"🖼️",title:"Visual Imagery",desc:"Draw or imagine the kanji shape as a picture. Kanji are pictographic — their shapes often resemble their meanings.",example:"山 (mountain) looks like three mountain peaks. 川 (river) looks like flowing water lines.",tag:"Kanji"},
+{icon:"🔊",title:"Sound Alike (Goroawase)",desc:"Japanese numbers and syllables can be mapped to memorable sounds. Use number puns to remember readings.",example:"“Go” (5) sounds like “gold ring” → 5 golden rings. “Ni” (2) sounds like “knee” → two knees.",tag:"Numbers"},
+{icon:"🧩",title:"Component Building",desc:"Break kanji into radicals (components) and build a story from the parts. Most kanji are composed of meaningful pieces.",example:"言 (word) + 売 (sell) = 読 (read) → a “bookstore” where words are sold to be read.",tag:"Kanji"},
+{icon:"⚡",title:"Exaggeration",desc:"Make the mental image absurd, huge, colourful, or ridiculous. Your brain flags unusual things as important and stores them deeper.",example:"To remember “ookii” (big), imagine a skyscraper sized “O” blocking the entire street.",tag:"Memory"},
+{icon:"🎵",title:"Rhythm & Song",desc:"Put words into a rhythmic chant or melody. Music engages a different memory pathway than plain reading.",example:"“Watashi wa, anata wa, kare wa, kanojo wa” — chant pronouns to a beat.",tag:"Vocabulary"},
+{icon:"🔁",title:"Spaced Repetition",desc:"Review at expanding intervals: 1 day, 3 days, 7 days, 21 days. Each successful recall at a slightly harder interval strengthens long-term memory.",example:"Use the Flashcards tab — the SRS scheduler handles this automatically.",tag:"Method"},
+{icon:"🤝",title:"Context & Collocation",desc:"Learn words in phrases, not alone. Knowing “koucha wo nomu” (drink black tea) is stronger than knowing “koucha” in isolation.",example:"“Kaimono” (shopping) → “kaimono ni ikimasu” (I go shopping).",tag:"Vocabulary"},
+{icon:"🏷️",title:"Keyword Method",desc:"Pick a familiar English keyword that sounds like the Japanese word, then create a vivid scene linking the keyword to the meaning.",example:"“Kangoshi” (nurse) → “can go she” → a nurse saying “can go, she?” to a patient.",tag:"Vocabulary"},
+{icon:"🎭",title:"Emotional Hook",desc:"Attach a personal emotion or experience to the word. Emotional memories are recalled more easily.",example:"“Yasashii” (kind) → remember a person who was kind to you and link the word to that memory.",tag:"Memory"},
+{icon:"📝",title:"Teach It to Remember It",desc:"Explain the word or grammar point to an imaginary student. The act of explaining forces deeper processing and reveals gaps.",example:"Try explaining は vs が to a beginner — you’ll remember the distinction better yourself.",tag:"Method"}
+];
+
+/* =====================================================================
+   4. SRS ENGINE (SM-2 inspired)
+   ===================================================================== */
+const SRS_DEFAULTS = {ease:2.5,interval:0,repetitions:0,due:0};
+
+function srsUpdate(card, quality){
+  // quality: 0=again, 1=hard, 2=good, 3=easy
+  const q = quality;
+  if(q === 0){
+    card.repetitions = 0;
+    card.interval = 1;
+  }else{
+    card.repetitions = (card.repetitions || 0) + 1;
+    if(card.repetitions === 1) card.interval = 1;
+    else if(card.repetitions === 2) card.interval = 3;
+    else card.interval = Math.round((card.interval || 1) * (card.ease || 2.5));
+    // quality adjustment
+    if(q === 1) card.ease = Math.max(1.3, (card.ease || 2.5) - 0.15);
+    if(q === 3) card.ease = Math.min(3.0, (card.ease || 2.5) + 0.1);
+  }
+  card.due = Date.now() + card.interval * 86400000;
+  return card;
+}
+
+/* =====================================================================
+   5. STATE
+   ===================================================================== */
+const STORE_KEY = "Japanese-lab-jlpt-v1";
+let state = {
+  completed: {},         // word key -> true
+  srs: {},               // word key -> SRS card
+  quizScore: 0,
+  quizTotal: 0,
+  theme: "dark",
+  currentLevel: "all",
+  currentTopic: "all",
+  currentVocabPage: 1,
+  quizSet: [],
+  quizAnswers: {},
+  srsQueue: [],
+  srsIndex: 0,
+  srsMode: "jp-en",
+  srsLevel: "all",
+  srsTopic: "all"
+};
+const $ = id => document.getElementById(id);
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(!raw) return;
+    const s = JSON.parse(raw);
+    if(!s || typeof s !== "object") return;
+    state = {...state, ...s};
+  }catch(e){}
+  if(!state.completed || typeof state.completed !== "object") state.completed = {};
+  if(!state.srs || typeof state.srs !== "object") state.srs = {};
+  if(!state.quizAnswers || typeof state.quizAnswers !== "object") state.quizAnswers = {};
+  if(!["dark","light"].includes(state.theme)) state.theme = "dark";
+  if(typeof state.quizScore !== "number") state.quizScore = 0;
+  if(typeof state.quizTotal !== "number") state.quizTotal = 0;
+  if(typeof state.currentVocabPage !== "number") state.currentVocabPage = 1;
+}
+function saveState(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); $("saveState").textContent = "Saved locally"; }catch(e){ $("saveState").textContent = "Storage unavailable"; }
+  updateProgressUI();
+}
+
+/* =====================================================================
+   6. HELPERS
+   ===================================================================== */
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function toast(msg){ const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 2200); }
+function debounce(fn, ms=140){ let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+function vocabKey(w){ return w[0] + "|" + w[1]; }
+function shuffle(arr){ const a = arr.slice(); for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+/* =====================================================================
+   7. VIEW SWITCHING
+   ===================================================================== */
+function goView(name){
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  const view = $("view-" + name);
+  if(view) view.classList.add("active");
+  document.querySelectorAll(".navtab").forEach(t => {
+    const active = t.dataset.view === name;
+    t.classList.toggle("active", active);
+    t.setAttribute("aria-selected", String(active));
+  });
+  $("sidebar").classList.remove("open");
+  $("mobileMenu").setAttribute("aria-expanded", "false");
+  if(name === "vocab") renderVocab();
+  if(name === "grammar") renderGrammar();
+  if(name === "mnemonics") renderMnemonicGrid();
+  window.scrollTo(0, 0);
+}
+
+/* =====================================================================
+   8. DASHBOARD
+   ===================================================================== */
+function updateProgressUI(){
+  const total = vocabulary.length;
+  const done = Object.keys(state.completed).length;
+  const pct = total ? Math.round(done / total * 100) : 0;
+  if($("dashVocab")) $("dashVocab").textContent = vocabulary.length;
+  if($("dashGrammar")) $("dashGrammar").textContent = grammar.length;
+  if($("dashDone")) $("dashDone").textContent = done + " / " + total;
+  if($("dashScore")) $("dashScore").textContent = state.quizScore + " / " + state.quizTotal;
+  if($("progressPct")) $("progressPct").textContent = pct + "%";
+  if($("progressBar")) $("progressBar").style.width = pct + "%";
+  if($("progressTrack")) $("progressTrack").setAttribute("aria-valuenow", String(pct));
+  if($("progressLabel")) $("progressLabel").textContent = done === 0 ? "Start with the Vocabulary tab to begin learning N5 words." : done + " words mastered. " + (total - done) + " remain.";
+  if($("vocabCount")) $("vocabCount").textContent = vocabulary.length + " words";
+  if($("grammarCount")) $("grammarCount").textContent = grammar.length + " grammar";
+}
+
+/* =====================================================================
+   9. VOCABULARY RENDERER
+   ===================================================================== */
+const VOCAB_PAGE_SIZE = 60;
+let vocabFilterText = "";
+
+function getFilteredVocab(){
+  const q = vocabFilterText.toLowerCase();
+  const level = state.currentLevel;
+  const topic = state.currentTopic;
+  return vocabulary.filter(w => {
+    if(level !== "all" && w[3] !== level) return false;
+    if(topic !== "all" && w[4] !== topic) return false;
+    if(q && !(w[0] + " " + w[1] + " " + w[2]).toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+
+function renderVocab(){
+  const filtered = getFilteredVocab();
+  const shown = filtered.slice(0, state.currentVocabPage * VOCAB_PAGE_SIZE);
+  $("vocabShown").textContent = `Showing ${shown.length} of ${filtered.length} words`;
+  $("vocabList").innerHTML = shown.map((w, i) => {
+    const key = vocabKey(w);
+    const done = state.completed[key];
+    return `<div class="vocab-card" data-vocab-index="${i}" data-key="${esc(key)}">
+      <span class="level-tag level-${w[3]}">${w[3].toUpperCase()}</span>
+      <div class="jp">${esc(w[0])} ${done ? '<span style="color:var(--green);font-size:13px">✓</span>' : ''}</div>
+      <div class="kana">${esc(w[1])}</div>
+      <div class="en">${esc(w[2])}</div>
+      <div class="meta"><span class="chip">${esc(w[4])}</span><button type="button" class="btn small" data-mark="${esc(key)}">${done ? "✓ Learned" : "Mark learned"}</button></div>
+      <div class="mnemonic">💡 ${esc(w[5])}</div>
+    </div>`;
+  }).join("");
+  if(!shown.length) $("vocabList").innerHTML = '<div class="empty">No words match your search.</div>';
+  $("loadMoreVocab").style.display = shown.length < filtered.length ? "inline-flex" : "none";
+}
+
+function bindVocabEvents(){
+  $("vocabList").addEventListener("click", e => {
+    const markBtn = e.target.closest("[data-mark]");
+    if(markBtn){
+      e.stopPropagation();
+      const key = markBtn.dataset.mark;
+      state.completed[key] = !state.completed[key];
+      saveState();
+      renderVocab();
+      return;
+    }
+    const card = e.target.closest(".vocab-card");
+    if(card) card.classList.toggle("expanded");
+  });
+  $("loadMoreVocab").addEventListener("click", () => { state.currentVocabPage++; saveState(); renderVocab(); });
+  $("vocabSearch").addEventListener("input", debounce(e => { vocabFilterText = e.target.value; state.currentVocabPage = 1; renderVocab(); }, 140));
+  document.querySelectorAll("[data-vlevel]").forEach(b => b.addEventListener("click", () => {
+    document.querySelectorAll("[data-vlevel]").forEach(x => x.classList.remove("active"));
+    b.classList.add("active");
+    state.currentLevel = b.dataset.vlevel;
+    state.currentVocabPage = 1;
+    saveState();
+    renderVocab();
+  }));
+  document.querySelectorAll("[data-vtopic]").forEach(b => b.addEventListener("click", () => {
+    document.querySelectorAll("[data-vtopic]").forEach(x => x.classList.remove("active"));
+    b.classList.add("active");
+    state.currentTopic = b.dataset.vtopic;
+    state.currentVocabPage = 1;
+    saveState();
+    renderVocab();
+  }));
+}
+
+/* =====================================================================
+   10. GRAMMAR RENDERER
+   ===================================================================== */
+function renderGrammar(){
+  const q = ($("grammarSearch").value || "").toLowerCase();
+  const level = state.grammarLevel || "all";
+  const filtered = grammar.filter(g => {
+    if(level !== "all" && g.level !== level) return false;
+    if(q && !(g.pattern + " " + g.meaning + " " + g.exampleJp + " " + g.exampleEn).toLowerCase().includes(q)) return false;
+    return true;
+  });
+  $("grammarShown").textContent = `${filtered.length} of ${grammar.length} patterns`;
+  $("grammarList").innerHTML = filtered.map((g, i) => `
+    <div class="grammar-card" data-gindex="${i}">
+      <span class="level-tag level-${g.level}">${g.level.toUpperCase()}</span>
+      <div class="pattern">${esc(g.pattern)}</div>
+      <div class="meaning">${esc(g.meaning)}</div>
+      <div class="structure">${esc(g.structure)}</div>
+      <div class="example-jp">${esc(g.exampleJp)}</div>
+      <div class="example-en">${esc(g.exampleEn)}</div>
+      <div class="mnemonic">💡 ${esc(g.mnemonic)}</div>
+      <div style="margin-top:6px"><span class="chip">${esc(g.topic)}</span></div>
+    </div>
+  `).join("");
+  if(!filtered.length) $("grammarList").innerHTML = '<div class="empty">No grammar patterns match your search.</div>';
+}
+
+function bindGrammarEvents(){
+  $("grammarSearch").addEventListener("input", debounce(renderGrammar, 140));
+  document.querySelectorAll("[data-glevel]").forEach(b => b.addEventListener("click", () => {
+    document.querySelectorAll("[data-glevel]").forEach(x => x.classList.remove("active"));
+    b.classList.add("active");
+    state.grammarLevel = b.dataset.glevel;
+    renderGrammar();
+  }));
+  $("grammarList").addEventListener("click", e => {
+    const card = e.target.closest(".grammar-card");
+    if(card) card.classList.toggle("expanded");
+  });
+}
+
+/* =====================================================================
+   11. QUIZ ENGINE
+   ===================================================================== */
+let currentQuiz = [];
+
+function generateQuiz(){
+  const type = $("quizType").value;
+  const level = $("quizLevel").value;
+  const count = parseInt($("quizCount").value, 10) || 20;
+
+  let pool = vocabulary.filter(w => level === "all" || w[3] === level);
+  if(type === "grammar"){
+    const gPool = grammar.filter(g => level === "all" || g.level === level);
+    const questions = shuffle(gPool).slice(0, count).map(g => {
+      const wrong = shuffle(gPool.filter(x => x !== g)).slice(0, 3);
+      return {
+        type: "grammar",
+        question: `What does "${g.pattern}" mean?`,
+        options: shuffle([g.meaning, ...wrong.map(w => w.meaning)]).slice(0, 4),
+        correct: g.meaning,
+        detail: g.exampleJp + " — " + g.exampleEn,
+        mnemonic: g.mnemonic
+      };
+    });
+    currentQuiz = questions;
+    renderQuiz();
+    return;
+  }
+
+  const questions = shuffle(pool).slice(0, count).map(w => {
+    const wrong = shuffle(vocabulary.filter(x => x[3] === w[3] && x !== w)).slice(0, 3);
+    if(type === "meaning" || type === "mixed"){
+      return {
+        type: "meaning",
+        question: `What does 「${w[0]}」(${w[1]}) mean?`,
+        options: shuffle([w[2], ...wrong.map(x => x[2])]).slice(0, 4),
+        correct: w[2],
+        detail: `${w[0]} (${w[1]}) — ${w[2]}`,
+        mnemonic: w[5]
+      };
+    }
+    if(type === "reading"){
+      return {
+        type: "reading",
+        question: `How do you read 「${w[0]}」?`,
+        options: shuffle([w[1], ...wrong.map(x => x[1])]).slice(0, 4),
+        correct: w[1],
+        detail: `${w[0]} is read ${w[1]} — ${w[2]}`,
+        mnemonic: w[5]
+      };
+    }
+    if(type === "reverse"){
+      return {
+        type: "reverse",
+        question: `Which Japanese word means "${w[2]}"?`,
+        options: shuffle([w[0], ...wrong.map(x => x[0])]).slice(0, 4),
+        correct: w[0],
+        detail: `${w[0]} (${w[1]}) — ${w[2]}`,
+        mnemonic: w[5]
+      };
+    }
+    return {type: "meaning", question: `What does 「${w[0]}」mean?`, options: shuffle([w[2], ...wrong.map(x => x[2])]).slice(0, 4), correct: w[2], detail: `${w[0]} (${w[1]}) — ${w[2]}`, mnemonic: w[5]};
+  });
+
+  // If mixed, add some grammar questions
+  if(type === "mixed"){
+    const gPool = grammar.filter(g => level === "all" || g.level === level);
+    const gQs = shuffle(gPool).slice(0, Math.max(1, Math.round(count * 0.3))).map(g => {
+      const wrong = shuffle(gPool.filter(x => x !== g)).slice(0, 3);
+      return {
+        type: "grammar",
+        question: `What does "${g.pattern}" mean?`,
+        options: shuffle([g.meaning, ...wrong.map(w => w.meaning)]).slice(0, 4),
+        correct: g.meaning,
+        detail: g.exampleJp + " — " + g.exampleEn,
+        mnemonic: g.mnemonic
+      };
+    });
+    currentQuiz = shuffle([...questions, ...gQs]).slice(0, count);
+  } else {
+    currentQuiz = questions;
+  }
+  renderQuiz();
+}
+
+function renderQuiz(){
+  if(!currentQuiz.length){ $("quizArea").innerHTML = '<div class="empty">Generate a quiz to begin.</div>'; return; }
+  const answered = Object.keys(state.quizAnswers).length;
+  const correct = Object.values(state.quizAnswers).filter(x => x.correct).length;
+  $("practiceScore").textContent = `Score: ${correct} / ${answered}`;
+  $("quizArea").innerHTML = currentQuiz.map((q, i) => {
+    const saved = state.quizAnswers[i];
+    return `<div class="card" data-qindex="${i}">
+      <div class="eyebrow">Question ${i + 1} of ${currentQuiz.length}</div>
+      <h3 style="margin:6px 0 10px">${esc(q.question)}</h3>
+      <div>${q.options.map((o, oi) => {
+        let cls = "quiz-option";
+        if(saved){
+          if(o === q.correct) cls += " correct";
+          else if(o === saved.choice) cls += " wrong";
+        }
+        return `<button type="button" class="${cls}" data-qi="${i}" data-oi="${oi}" ${saved ? "disabled" : ""}>${String.fromCharCode(65 + oi)}. ${esc(o)}</button>`;
+      }).join("")}</div>
+      <div class="quiz-feedback${saved ? " show" : ""}" id="qfb-${i}">
+        ${saved ? `<b>${saved.correct ? "✓ Correct." : "✗ Not quite."}</b><div class="jp">${esc(q.detail)}</div>${q.mnemonic ? `<div style="margin-top:6px;color:var(--purple)">💡 ${esc(q.mnemonic)}</div>` : ""}` : ""}
+      </div>
+    </div>`;
+  }).join("");
+  $("quizArea").querySelectorAll("[data-qi]").forEach(b => {
+    if(b.disabled) return;
+    b.addEventListener("click", () => answerQuiz(+b.dataset.qi, +b.dataset.oi));
+  });
+}
+
+function answerQuiz(qi, oi){
+  const q = currentQuiz[qi];
+  const box = document.querySelector(`[data-qindex="${qi}"]`);
+  box.querySelectorAll(".quiz-option").forEach(b => {
+    b.disabled = true;
+    const c = +b.dataset.oi;
+    if(q.options[c] === q.correct) b.classList.add("correct");
+    else if(c === oi) b.classList.add("wrong");
+  });
+  const choice = q.options[oi];
+  const correct = choice === q.correct;
+  state.quizAnswers[qi] = {choice, correct};
+  state.quizTotal++;
+  if(correct) state.quizScore++;
+  saveState();
+  const fb = $(`qfb-${qi}`);
+  fb.classList.add("show");
+  fb.innerHTML = `<b>${correct ? "✓ Correct." : "✗ Not quite."}</b><div class="jp">${esc(q.detail)}</div>${q.mnemonic ? `<div style="margin-top:6px;color:var(--purple)">💡 ${esc(q.mnemonic)}</div>` : ""}`;
+  const answered = Object.keys(state.quizAnswers).length;
+  const corr = Object.values(state.quizAnswers).filter(x => x.correct).length;
+  $("practiceScore").textContent = `Score: ${corr} / ${answered}`;
+}
+
+function bindQuizEvents(){
+  $("startQuiz").addEventListener("click", () => { state.quizAnswers = {}; generateQuiz(); });
+  $("clearQuiz").addEventListener("click", () => { currentQuiz = []; state.quizAnswers = {}; renderQuiz(); });
+}
+
+/* =====================================================================
+   12. FLASHCARD / SRS ENGINE
+   ===================================================================== */
+let srsDeck = [];
+let srsCurrent = null;
+
+function buildSrsQueue(){
+  const level = $("srsLevel").value;
+  const topic = $("srsTopic").value;
+  const mode = $("srsMode").value;
+  state.srsMode = mode;
+  state.srsLevel = level;
+  state.srsTopic = topic;
+  let pool = vocabulary.filter(w => (level === "all" || w[3] === level) && (topic === "all" || w[4] === topic));
+  const now = Date.now();
+  // Due cards first, then new cards
+  const due = pool.filter(w => { const c = state.srs[vocabKey(w)]; return c && c.due <= now; });
+  const fresh = pool.filter(w => !state.srs[vocabKey(w)]);
+  srsDeck = [...shuffle(due), ...shuffle(fresh).slice(0, 20)];
+  if(!srsDeck.length) srsDeck = shuffle(pool).slice(0, 20);
+  srsCurrent = 0;
+  showSrsCard();
+}
+
+function showSrsCard(){
+  if(!srsDeck.length || srsCurrent >= srsDeck.length){
+    $("srsArea").innerHTML = '<div class="card empty">🎉 Session complete! Come back tomorrow for your next review.<br><button type="button" class="btn primary" style="margin-top:12px" id="srsRestart">Restart session</button></div>';
+    const rb = $("srsRestart"); if(rb) rb.addEventListener("click", buildSrsQueue);
+    $("srsStatus").textContent = "Complete";
+    return;
+  }
+  const w = srsDeck[srsCurrent];
+  const key = vocabKey(w);
+  const card = state.srs[key] || {...SRS_DEFAULTS};
+  const isJpEn = state.srsMode === "jp-en";
+  const frontWord = isJpEn ? w[0] : w[2];
+  const backWord = isJpEn ? w[0] : w[2];
+  const backMeaning = isJpEn ? w[2] : w[0];
+  const backKana = w[1];
+  const knownCount = Object.keys(state.srs).length;
+
+  $("srsStatus").textContent = `Card ${srsCurrent + 1} / ${srsDeck.length}`;
+  $("srsArea").innerHTML = `
+    <div class="card" style="text-align:center;padding:8px 0 4px">
+      <div class="tiny" style="margin-bottom:10px">${esc(w[3].toUpperCase())} · ${esc(w[4])} · SRS cards tracked: ${knownCount}</div>
+      <div class="flashcard-area">
+        <div class="flashcard" id="flashcard">
+          <div class="fc-face fc-front">
+            <div class="word">${esc(frontWord)}</div>
+            <div class="hint">Tap to reveal</div>
+          </div>
+          <div class="fc-face fc-back">
+            <div class="word">${esc(backWord)}</div>
+            <div class="kana">${esc(backKana)}</div>
+            <div class="meaning">${esc(backMeaning)}</div>
+            <div class="mnemonic">💡 ${esc(w[5])}</div>
+          </div>
+        </div>
+      </div>
+      <div class="btn-row" style="margin-top:20px;justify-content:center">
+        <button type="button" class="btn" data-srs="0">Again</button>
+        <button type="button" class="btn" data-srs="1">Hard</button>
+        <button type="button" class="btn green" data-srs="2">Good</button>
+        <button type="button" class="btn primary" data-srs="3">Easy</button>
+      </div>
+      <div class="tiny" style="margin-top:10px">Again = reset · Hard = shorter interval · Good = normal · Easy = longer interval</div>
+    </div>`;
+
+  const fc = $("flashcard");
+  fc.addEventListener("click", () => fc.classList.toggle("flipped"));
+  document.querySelectorAll("[data-srs]").forEach(b => {
+    b.addEventListener("click", e => {
+      e.stopPropagation();
+      const quality = +b.dataset.srs;
+      const c = state.srs[key] || {...SRS_DEFAULTS};
+      srsUpdate(c, quality);
+      state.srs[key] = c;
+      if(quality >= 2) state.completed[key] = true;
+      saveState();
+      srsCurrent++;
+      showSrsCard();
+    });
+  });
+}
+
+function bindFlashcardEvents(){
+  $("startSrs").addEventListener("click", buildSrsQueue);
+  $("srsShuffle").addEventListener("click", () => { srsDeck = shuffle(srsDeck); srsCurrent = 0; showSrsCard(); });
+  $("srsReset").addEventListener("click", () => {
+    if(confirm("Reset all SRS progress? This cannot be undone.")){
+      state.srs = {};
+      saveState();
+      toast("SRS reset");
+    }
+  });
+}
+
+/* =====================================================================
+   13. MNEMONICS GRID
+   ===================================================================== */
+function renderMnemonicGrid(){
+  $("mnemonicGrid").innerHTML = mnemonicTechniques.map(m => `
+    <div class="card">
+      <div style="display:flex;gap:10px;align-items:flex-start">
+        <span style="font-size:24px" aria-hidden="true">${m.icon}</span>
+        <div>
+          <h3 style="margin:0 0 4px">${esc(m.title)}</h3>
+          <span class="chip accent">${esc(m.tag)}</span>
+        </div>
+      </div>
+      <p class="small" style="color:var(--muted);margin:10px 0 8px;line-height:1.7">${esc(m.desc)}</p>
+      <div style="font-size:12px;color:var(--purple);background:rgba(196,168,240,.08);padding:8px 10px;border-radius:7px;border-left:2px solid var(--purple)">
+        <strong>Example:</strong> ${esc(m.example)}
+      </div>
+    </div>
+  `).join("");
+}
+
+/* =====================================================================
+   14. THEME
+   ===================================================================== */
+function applyTheme(){
+  document.body.dataset.theme = state.theme;
+  const btn = $("themeBtn");
+  btn.textContent = state.theme === "dark" ? "☀ Light" : "☾ Dark";
+  btn.setAttribute("aria-pressed", String(state.theme === "light"));
+  btn.setAttribute("aria-label", "Switch to " + (state.theme === "dark" ? "light" : "dark") + " mode");
+  btn.title = "Switch to " + (state.theme === "dark" ? "light" : "dark") + " mode";
+}
+
+/* =====================================================================
+   15. EXPORT / IMPORT
+   ===================================================================== */
+function exportProgress(){
+  const data = {
+    app: "Japanese Lab JLPT N5-N4",
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    completed: state.completed,
+    srs: state.srs,
+    quizScore: state.quizScore,
+    quizTotal: state.quizTotal,
+    theme: state.theme
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "Japanese-lab-progress.json";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast("Progress exported");
+}
+
+function importProgress(file){
+  const r = new FileReader();
+  r.onload = () => {
+    try{
+      const d = JSON.parse(r.result);
+      if(d.completed && typeof d.completed === "object") state.completed = d.completed;
+      if(d.srs && typeof d.srs === "object") state.srs = d.srs;
+      if(typeof d.quizScore === "number") state.quizScore = d.quizScore;
+      if(typeof d.quizTotal === "number") state.quizTotal = d.quizTotal;
+      if(["dark","light"].includes(d.theme)) state.theme = d.theme;
+      saveState(); applyTheme(); renderVocab(); updateProgressUI();
+      toast("Progress imported");
+    }catch(e){ toast("Invalid progress file"); }
+  };
+  r.readAsText(file);
+}
+
+/* =====================================================================
+   16. INIT
+   ===================================================================== */
+function init(){
+  loadState();
+  applyTheme();
+
+  // Tabs
+  document.querySelectorAll(".navtab").forEach(t => t.addEventListener("click", () => goView(t.dataset.view)));
+  document.querySelectorAll("[data-goto]").forEach(el => el.addEventListener("click", () => goView(el.dataset.goto)));
+
+  // Theme
+  $("themeBtn").addEventListener("click", () => { state.theme = state.theme === "dark" ? "light" : "dark"; applyTheme(); saveState(); });
+
+  // Print
+  $("printBtn").addEventListener("click", () => window.print());
+
+  // Export / import
+  $("exportBtn").addEventListener("click", exportProgress);
+  $("importBtn").addEventListener("click", () => $("importFile").click());
+  $("importFile").addEventListener("change", e => { if(e.target.files[0]) importProgress(e.target.files[0]); e.target.value = ""; });
+
+  // Mobile menu
+  $("mobileMenu").addEventListener("click", () => {
+    const sidebar = $("sidebar");
+    const open = sidebar.classList.toggle("open");
+    $("mobileMenu").setAttribute("aria-expanded", String(open));
+  });
+
+  // Sidebar level buttons
+  document.querySelectorAll("[data-level]").forEach(b => b.addEventListener("click", () => {
+    document.querySelectorAll("[data-level]").forEach(x => x.classList.remove("active"));
+    b.classList.add("active");
+    state.currentLevel = b.dataset.level;
+    state.currentVocabPage = 1;
+    saveState();
+    renderVocab();
+    renderGrammar();
+  }));
+
+  // Dashboard quick buttons
+  $("startVocabBtn").addEventListener("click", () => goView("vocab"));
+  $("startFlashBtn").addEventListener("click", () => { goView("flashcards"); buildSrsQueue(); });
+  $("startQuizBtn").addEventListener("click", () => { goView("practice"); generateQuiz(); });
+  $("resetAllBtn").addEventListener("click", () => {
+    if(confirm("Reset all progress, SRS data, and quiz scores? This cannot be undone.")){
+      state.completed = {}; state.srs = {}; state.quizScore = 0; state.quizTotal = 0; state.quizAnswers = {};
+      saveState(); renderVocab(); updateProgressUI(); toast("All progress reset");
+    }
+  });
+
+  // Bind sub-systems
+  bindVocabEvents();
+  bindGrammarEvents();
+  bindQuizEvents();
+  bindFlashcardEvents();
+
+  // Initial renders
+  renderVocab();
+  renderGrammar();
+  renderMnemonicGrid();
+  updateProgressUI();
+
+  // Keyboard shortcuts
+  document.addEventListener("keydown", e => {
+    const tag = document.activeElement && document.activeElement.tagName;
+    const typing = ["INPUT","TEXTAREA","SELECT"].includes(tag);
+    if(e.key === "/" && !typing){ e.preventDefault(); $("vocabSearch").focus(); }
+    if(e.key === "Escape" && document.activeElement === $("vocabSearch")){ $("vocabSearch").value = ""; vocabFilterText = ""; renderVocab(); }
+  });
+
+  saveState();
+}
+
+init();
+</script>
+</body>
+</html>
