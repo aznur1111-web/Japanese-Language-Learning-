@@ -1,58 +1,121 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="dark light">
-<meta name="theme-color" content="#171512">
-<meta name="description" content="A self-contained JLPT N5–N4 Japanese learning lab with vocabulary, grammar, SRS flashcards, mnemonics, and interactive practice.">
-<title>Japanese Lab — JLPT N5 → N4 Japanese Learning Lab</title>
+<meta name="theme-color" content="#1b1a19">
+<meta name="description" content="Kotoba Lab — a self-contained JLPT N5–N4 Japanese learning lab with vocabulary, grammar, SRS flashcards, mnemonics, and interactive practice.">
+<title>Kotoba Lab — JLPT N5 → N4 Japanese Learning Lab</title>
+<script>
+/* Apply the saved (or system) theme before first paint so there is no flash.
+   Reads the new storage key first, then the legacy "sakura-lab-jlpt-v1" key. */
+(function(){
+  var t;
+  try{
+    t = (JSON.parse(
+          localStorage.getItem("kotoba-lab-jlpt-v1") ||
+          localStorage.getItem("sakura-lab-jlpt-v1") || "{}"
+        ) || {}).theme;
+  }catch(e){}
+  if(t !== "light" && t !== "dark"){
+    t = window.matchMedia && matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  }
+  document.documentElement.setAttribute("data-theme", t);
+  var m = document.querySelector('meta[name="theme-color"]');
+  if(m) m.setAttribute("content", t === "light" ? "#f5f4ed" : "#1b1a19");
+})();
+</script>
 <style>
+/* =====================================================================
+   DESIGN TOKENS — Claude orange on warm neutrals, light + dark
+   ===================================================================== */
+:root,:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#1b1a19; --panel:#262624; --panel2:#30302e; --panel3:#201f1e;
+  --line:#3b3a37; --line2:#4c4a46;
+  --text:#faf9f5; --muted:#bfbdb3; --subtle:#9d9b92;
+  --accent:#d97757;            /* Claude orange: fills, borders, bars */
+  --accent-ink:#ee9d80;        /* orange used for text / focus ring   */
+  --primary:#d97757; --primary-hover:#e48c6e; --on-primary:#1b1a19;
+  --green:#a5bc88; --blue:#90b9e1; --red:#f09a8d; --kraft:#dfb590;
+  --shadow:0 10px 28px rgba(0,0,0,.28);
+}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --bg:#f5f4ed; --panel:#ffffff; --panel2:#f0eee6; --panel3:#f8f7f2;
+  --line:#e4e1d5; --line2:#d2cebf;
+  --text:#141413; --muted:#55544f; --subtle:#6a6961;
+  --accent:#d97757;
+  --accent-ink:#a84a28;
+  --primary:#bf5233; --primary-hover:#a84527; --on-primary:#ffffff;
+  --green:#4f6538; --blue:#285d8e; --red:#a8342a; --kraft:#7f4f24;
+  --shadow:0 6px 20px rgba(20,20,19,.06);
+}
+:root{
+  --radius:12px;
+  --font-sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Hiragino Sans","Yu Gothic UI","Noto Sans JP",Meiryo,sans-serif;
+  --font-serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Hiragino Mincho ProN","Yu Mincho",serif;
+}
+
+/* ---------- Base ---------- */
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--text);font:14px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
---bg:#171512;--panel:#211e1a;--panel2:#2b2620;--panel3:#1b1916;--line:#3a332b;--line2:#51463a;
---text:#f4efe8;--muted:#c0b6a8;--subtle:#958879;--accent:#e87935;--accent2:#ff9b54;--blue:#91b9f5;
---green:#7dd8a8;--yellow:#f0d080;--red:#ff9a9a;--purple:#c4a8f0;--shadow:0 12px 32px rgba(0,0,0,.18);--radius:12px}
-body[data-theme="light"]{color-scheme:light;--bg:#faf7f2;--panel:#ffffff;--panel2:#fff0e4;--panel3:#fcf8f2;--line:#eadfd2;--line2:#d9c4af;--text:#29231d;--muted:#6e6256;--subtle:#8b7d6f;--accent:#c85b20;--accent2:#a94716;--blue:#3060a8;--green:#20744d;--yellow:#946512;--red:#b83c36;--purple:#7552a3;--shadow:0 6px 20px rgba(75,48,25,.06)}
-button,input,textarea,select{font:inherit}
-::selection{background:var(--accent);color:#fff}
-button,.card,.stat,.vocab-card,.grammar-card,.path-card,.navtab,.side-item,.btn,.filter-btn{transition:background-color .16s ease,border-color .16s ease,color .16s ease,box-shadow .16s ease}
-body{min-height:100vh}
-.card:hover{border-color:color-mix(in srgb,var(--line) 70%,var(--accent))}
-.btn.primary{box-shadow:0 2px 8px rgba(200,91,32,.16)}
-:focus-visible{scroll-margin:16px}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.6 var(--font-sans)}
+::selection{background:color-mix(in srgb,var(--accent) 32%,transparent)}
+button,input,textarea,select{font:inherit;color:inherit}
 button{cursor:pointer}
-button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent-ink);outline-offset:2px}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip-link{position:absolute;left:12px;top:-60px;z-index:100;padding:8px 14px;border-radius:8px;background:var(--primary);color:var(--on-primary);font-weight:700;text-decoration:none}
+.skip-link:focus{top:10px}
+h1,h2,h3{font-weight:650}
+.page-title{font:600 clamp(22px,2.8vw,30px)/1.2 var(--font-serif);letter-spacing:-.015em;margin:0 0 6px}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
 
 /* ---------- Topbar ---------- */
-.topbar{min-height:62px;display:flex;align-items:center;gap:18px;padding:10px 20px;border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:10;flex-wrap:wrap}
+.topbar{min-height:62px;display:flex;align-items:center;gap:16px;padding:10px 20px;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--panel) 94%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);position:sticky;top:0;z-index:10;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:10px;min-width:200px}
-.brand-mark{width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--line2);background:var(--panel2);color:var(--accent);border-radius:10px;font-weight:850;font-size:14px}
-.brand strong{display:block;font-size:14px;letter-spacing:-.01em}
-.brand small{display:block;font-size:9px;letter-spacing:.14em;color:var(--muted);margin-top:1px}
-.top-meta{display:flex;align-items:center;gap:8px;flex:1;min-width:0;color:var(--muted);font-size:11px}
-.top-chip{border:1px solid var(--line);padding:4px 8px;border-radius:6px;white-space:nowrap}
+.brand-mark{width:36px;height:36px;display:grid;place-items:center;border-radius:10px;background:var(--primary);color:var(--on-primary);font-weight:800;font-size:17px}
+.brand strong{display:block;font:650 17px/1.15 var(--font-serif);letter-spacing:-.01em}
+.brand small{display:block;font-size:10px;letter-spacing:.12em;color:var(--muted);margin-top:2px}
+.top-meta{display:flex;align-items:center;gap:8px;flex:1;min-width:0;color:var(--muted);font-size:12px}
+.top-chip{border:1px solid var(--line);padding:3px 9px;border-radius:99px;white-space:nowrap}
 .top-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.btn{display:inline-flex;justify-content:center;align-items:center;gap:6px;border:1px solid var(--line2);background:var(--panel2);color:var(--text);border-radius:8px;padding:7px 11px;font-size:11px;font-weight:650;white-space:nowrap}
+
+/* Theme switch (segmented control) */
+.seg{display:inline-flex;gap:2px;padding:2px;border:1px solid var(--line2);border-radius:10px;background:var(--panel3)}
+.seg-btn{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;color:var(--muted);padding:5px 11px;border-radius:8px;font-size:12px;font-weight:650;white-space:nowrap;transition:background .15s,color .15s}
+.seg-btn svg{flex:none}
+.seg-btn:hover{color:var(--text)}
+.seg-btn[aria-pressed="true"]{background:var(--primary);color:var(--on-primary)}
+
+/* ---------- Buttons ---------- */
+.btn{display:inline-flex;justify-content:center;align-items:center;gap:6px;border:1px solid var(--line2);background:var(--panel2);color:var(--text);border-radius:8px;padding:7px 12px;font-size:12px;font-weight:650;white-space:nowrap;transition:border-color .15s,background .15s,color .15s}
 .btn:hover{border-color:var(--accent)}
-.btn.primary{background:linear-gradient(135deg,#e87935,#c85b20);border-color:#f09a60;color:#fff}
-.btn.primary:hover{background:linear-gradient(135deg,#d96625,#a94716)}
-.btn.green{background:linear-gradient(135deg,#208060,#186850);border-color:#40a080;color:#fff}
-.btn.small{padding:4px 8px;font-size:10px}
-.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+.btn.primary:hover{background:var(--primary-hover);border-color:var(--primary-hover)}
+.btn.good{border-color:var(--green);color:var(--green);background:color-mix(in srgb,var(--green) 12%,var(--panel))}
+.btn.good:hover{background:color-mix(in srgb,var(--green) 22%,var(--panel));border-color:var(--green)}
+.btn.again{border-color:var(--red);color:var(--red);background:color-mix(in srgb,var(--red) 10%,var(--panel))}
+.btn.again:hover{background:color-mix(in srgb,var(--red) 20%,var(--panel));border-color:var(--red)}
+.btn.small{padding:4px 9px;font-size:11px}
 .btn.ghost{background:transparent}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn kbd{margin-left:2px}
 
 /* ---------- Tabs ---------- */
 .navtabs{display:flex;gap:2px;padding:0 20px;overflow-x:auto;border-bottom:1px solid var(--line);background:var(--panel)}
-.navtab{padding:10px 16px;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;color:var(--muted);white-space:nowrap;font-size:12px;font-weight:700;cursor:pointer}
+.navtab{padding:11px 16px;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;color:var(--muted);white-space:nowrap;font-size:13px;font-weight:650}
 .navtab:hover{color:var(--text)}
-.navtab.active{border-bottom-color:var(--accent);color:var(--accent);background:linear-gradient(0deg,rgba(232,121,53,.09),transparent)}
+.navtab.active{border-bottom-color:var(--accent);color:var(--accent-ink);background:linear-gradient(0deg,color-mix(in srgb,var(--accent) 10%,transparent),transparent)}
 
 /* ---------- Layout ---------- */
 .layout{max-width:1500px;margin:0 auto;padding:16px;display:grid;grid-template-columns:240px minmax(0,1fr);gap:14px;align-items:start}
-.sidebar{position:sticky;top:74px;max-height:calc(100vh - 86px);overflow:auto;padding:12px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius)}
+.sidebar{position:sticky;top:74px;max-height:calc(100vh - 90px);overflow:auto;padding:12px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius)}
 .sidebar::-webkit-scrollbar{width:7px}
 .sidebar::-webkit-scrollbar-thumb{background:var(--line2);border-radius:7px}
 .main{min-width:0}
@@ -60,153 +123,175 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 /* ---------- Views ---------- */
 .view{display:none}
 .view.active{display:block;animation:fade .18s ease}
-@keyframes fade{from{opacity:.7;transform:translateY(2px)}to{opacity:1;transform:none}}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@keyframes fade{from{opacity:.6;transform:translateY(3px)}to{opacity:1;transform:none}}
 
-/* ---------- Cards / panels ---------- */
+/* ---------- Cards / text ---------- */
 .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin-bottom:14px;box-shadow:var(--shadow);min-width:0}
 .card h2,.card h3{margin:0 0 10px}
-.card h2{font-size:17px;letter-spacing:-.02em}
-.card h3{font-size:13px;font-weight:750}
-.eyebrow{font-size:9px;font-weight:800;letter-spacing:.16em;color:var(--subtle);text-transform:uppercase;margin-bottom:6px}
-.lead{max-width:820px;color:var(--muted);font-size:13px;margin:0 0 16px}
+.card h2{font:600 18px/1.25 var(--font-serif);letter-spacing:-.01em}
+.card h3{font-size:14px}
+.eyebrow{font-size:10px;font-weight:800;letter-spacing:.14em;color:var(--accent-ink);text-transform:uppercase;margin-bottom:6px}
+.lead{max-width:820px;color:var(--muted);font-size:14px;margin:0 0 16px}
 .muted{color:var(--muted)}
 .small{font-size:12px}
-.tiny{font-size:10px;color:var(--subtle)}
+.tiny{font-size:11px;color:var(--subtle)}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.section-head h2{margin:0}
+.mt-12{margin-top:12px}.mb-14{margin-bottom:14px}
 
 /* ---------- Stats ---------- */
 .stat{position:relative;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:14px 16px;overflow:hidden}
 .stat:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
-.stat .k{font-size:9px;font-weight:800;letter-spacing:.1em;color:var(--subtle);text-transform:uppercase}
-.stat .v{font-size:24px;font-weight:800;margin:4px 0 2px;letter-spacing:-.02em}
-.stat .d{font-size:11px;color:var(--muted)}
+.stat .k{font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--subtle);text-transform:uppercase}
+.stat .v{font:600 26px/1.2 var(--font-serif);margin:4px 0 2px}
+.stat .d{font-size:12px;color:var(--muted)}
 
 /* ---------- Progress ---------- */
-.progress-track{height:6px;background:var(--panel3);border-radius:99px;overflow:hidden;margin:8px 0}
-.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--purple));border-radius:99px;transition:width .3s}
+.progress-track{height:7px;background:var(--panel2);border-radius:99px;overflow:hidden;margin:8px 0}
+.progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--kraft));border-radius:99px;transition:width .3s}
 
-/* ---------- Vocabulary card ---------- */
-.vocab-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:10px;cursor:pointer;position:relative}
+/* ---------- Tags, chips, notes ---------- */
+.level-tag{font-size:10px;font-weight:800;padding:2px 7px;border-radius:5px;letter-spacing:.06em}
+.level-n5{background:color-mix(in srgb,var(--green) 14%,transparent);color:var(--green);border:1px solid color-mix(in srgb,var(--green) 34%,transparent)}
+.level-n4{background:color-mix(in srgb,var(--blue) 14%,transparent);color:var(--blue);border:1px solid color-mix(in srgb,var(--blue) 34%,transparent)}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:650;padding:3px 8px;border-radius:6px;background:var(--panel3);border:1px solid var(--line);color:var(--muted)}
+.chip.accent{border-color:color-mix(in srgb,var(--accent) 55%,transparent);color:var(--accent-ink)}
+.mnemonic-note{font-size:12px;color:var(--kraft);margin-top:8px;padding:7px 10px;background:color-mix(in srgb,var(--kraft) 10%,transparent);border-radius:7px;border-left:2px solid var(--kraft)}
+
+/* ---------- Form controls ---------- */
+.field label{display:block;margin-bottom:4px;font-size:11px;font-weight:650;color:var(--subtle)}
+select,.search-box{width:100%;padding:9px 11px;border:1px solid var(--line2);border-radius:8px;background:var(--panel3);color:var(--text);font-size:13px}
+select:hover,.search-box:hover{border-color:color-mix(in srgb,var(--accent) 50%,var(--line2))}
+.search-box:focus,select:focus{border-color:var(--accent);outline:none}
+.search-box:focus-visible,select:focus-visible{outline:2px solid var(--accent-ink);outline-offset:1px}
+.filter-group{display:flex;align-items:center;gap:10px;margin:10px 0}
+.filter-label{flex:none;min-width:48px;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--subtle)}
+.filter-row{display:flex;gap:6px;flex-wrap:wrap}
+.filter-btn{padding:5px 11px;border-radius:99px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:12px;font-weight:650}
+.filter-btn:hover{border-color:var(--accent);color:var(--text)}
+.filter-btn.active{background:color-mix(in srgb,var(--accent) 16%,var(--panel));border-color:var(--accent);color:var(--accent-ink)}
+
+/* ---------- Sidebar nav ---------- */
+.side-title{font-size:10px;font-weight:800;letter-spacing:.14em;color:var(--subtle);text-transform:uppercase;margin:14px 6px 6px}
+.side-title:first-child{margin-top:2px}
+.side-item{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;text-align:left;padding:8px 10px;border-radius:8px;border:0;background:transparent;color:var(--muted);font-size:13px;font-weight:550;margin-bottom:1px}
+.side-item:hover{background:var(--panel2);color:var(--text)}
+.side-item.active{background:color-mix(in srgb,var(--accent) 15%,var(--panel));color:var(--accent-ink);font-weight:700}
+.side-item .count{font-size:11px;font-weight:600;color:var(--subtle)}
+.side-item.active .count{color:var(--accent-ink)}
+
+/* ---------- Vocabulary ---------- */
+#vocabList{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;align-items:start}
+.vocab-card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;cursor:pointer;transition:border-color .15s;content-visibility:auto;contain-intrinsic-size:auto 140px}
 .vocab-card:hover{border-color:var(--accent)}
-.vocab-card .jp{font-size:20px;font-weight:750;letter-spacing:.02em}
-.vocab-card .kana{font-size:13px;color:var(--accent);margin-top:2px}
+.vocab-card.learned{border-left:3px solid var(--green)}
+.vocab-card .level-tag{position:absolute;top:10px;right:12px}
+.vocab-card .jp{font-size:22px;font-weight:700;letter-spacing:.02em;padding-right:44px}
+.vocab-card .tick{color:var(--green);font-size:14px}
+.vocab-card .kana{font-size:14px;color:var(--accent-ink);margin-top:1px}
 .vocab-card .en{font-size:13px;color:var(--muted);margin-top:4px}
-.vocab-card .level-tag{position:absolute;top:10px;right:12px;font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;letter-spacing:.06em}
-.level-n5{background:rgba(125,216,168,.15);color:var(--green);border:1px solid rgba(125,216,168,.3)}
-.level-n4{background:rgba(132,184,255,.15);color:var(--blue);border:1px solid rgba(132,184,255,.3)}
-.vocab-card .mnemonic{font-size:11px;color:var(--purple);margin-top:6px;padding:6px 8px;background:rgba(196,168,240,.08);border-radius:6px;border-left:2px solid var(--purple);display:none}
+.vocab-card .meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.vocab-card .mnemonic{display:none}
 .vocab-card.expanded .mnemonic{display:block}
-.vocab-card .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
 
-/* ---------- Grammar card ---------- */
-.grammar-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:10px}
-.grammar-card .pattern{font-size:17px;font-weight:750;color:var(--accent2)}
-.grammar-card .meaning{font-size:13px;color:var(--text);margin:6px 0}
-.grammar-card .structure{font-size:11px;color:var(--subtle);font-family:ui-monospace,monospace;background:var(--panel3);padding:6px 8px;border-radius:6px;margin:6px 0}
-.grammar-card .example-jp{font-size:14px;margin:6px 0 2px}
-.grammar-card .example-en{font-size:12px;color:var(--muted);font-style:italic}
-.grammar-card .mnemonic{font-size:11px;color:var(--purple);margin-top:6px;padding:6px 8px;background:rgba(196,168,240,.08);border-radius:6px;border-left:2px solid var(--purple);display:none}
-.grammar-card.expanded .mnemonic{display:block}
-.grammar-card .level-tag{display:inline-block;font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;letter-spacing:.06em;margin-left:8px;vertical-align:middle}
+/* ---------- Grammar ---------- */
+.grammar-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:border-color .15s;content-visibility:auto;contain-intrinsic-size:auto 200px}
+.grammar-card:hover{border-color:var(--accent)}
+.grammar-card .pattern{font-size:18px;font-weight:700;color:var(--accent-ink)}
+.grammar-card .level-tag{display:inline-block;margin-left:8px;vertical-align:middle}
+.grammar-card .meaning{font-size:14px;margin:6px 0}
+.grammar-card .structure{font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--muted);background:var(--panel3);padding:6px 9px;border-radius:6px;margin:6px 0}
+.grammar-card .example-jp{font-size:15px;margin:6px 0 2px}
+.grammar-card .example-en{font-size:13px;color:var(--muted);font-style:italic}
+.grammar-card .mnemonic-note{display:none}
+.grammar-card.expanded .mnemonic-note{display:block}
+.grammar-card .foot{margin-top:8px}
 
 /* ---------- Flashcard ---------- */
 .flashcard-area{perspective:1200px;max-width:560px;margin:0 auto}
-.flashcard{position:relative;width:100%;min-height:300px;transform-style:preserve-3d;transition:transform .5s ease}
+.flashcard{position:relative;width:100%;height:340px;transform-style:preserve-3d;transition:transform .5s ease;cursor:pointer;border-radius:16px}
 .flashcard.flipped{transform:rotateY(180deg)}
-.fc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--panel);border:1px solid var(--line);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 24px;text-align:center;box-shadow:var(--shadow)}
-.fc-back{transform:rotateY(180deg)}
-.fc-front .word{font-size:36px;font-weight:800;letter-spacing:.02em}
-.fc-front .hint{font-size:12px;color:var(--subtle);margin-top:14px}
-.fc-back .word{font-size:24px;font-weight:750}
-.fc-back .kana{font-size:14px;color:var(--accent);margin-top:4px}
-.fc-back .meaning{font-size:18px;margin-top:12px;font-weight:600}
-.fc-back .mnemonic{font-size:12px;color:var(--purple);margin-top:14px;padding:10px 12px;background:rgba(196,168,240,.08);border-radius:8px;border-left:2px solid var(--purple);max-width:90%}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--panel2);border:1px solid var(--line2);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px 24px;text-align:center;box-shadow:var(--shadow);overflow:auto}
+.fc-front{border-top:3px solid var(--accent)}
+.fc-back{transform:rotateY(180deg);background:var(--panel)}
+.fc-front .word{font-size:38px;font-weight:750;letter-spacing:.02em;line-height:1.25}
+.fc-front .hint{font-size:12px;color:var(--subtle);margin-top:16px}
+.fc-back .word{font-size:28px;font-weight:700}
+.fc-back .kana{font-size:15px;color:var(--accent-ink);margin-top:2px}
+.fc-back .meaning{font-size:19px;margin-top:12px;font-weight:600}
+.fc-back .mnemonic-note{max-width:92%;margin-top:14px;text-align:left}
 
 /* ---------- Quiz ---------- */
-.quiz-option{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:8px;margin:6px 0;padding:11px 14px;font-size:13px;font-weight:500;cursor:pointer;white-space:normal}
-.quiz-option:hover{border-color:var(--accent);background:var(--panel2)}
-.quiz-option.correct{border-color:var(--green);background:rgba(125,216,168,.1);color:var(--green)}
-.quiz-option.wrong{border-color:var(--red);background:rgba(255,154,154,.1);color:var(--red)}
-.quiz-option:disabled{cursor:default;opacity:.7}
-.quiz-feedback{display:none;padding:12px 14px;background:var(--panel3);border-radius:8px;margin-top:10px;font-size:12px;line-height:1.7;border-left:3px solid var(--accent)}
+.quiz-option{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:8px;margin:6px 0;padding:11px 14px;font-size:14px;font-weight:500;white-space:normal;transition:border-color .15s,background .15s}
+.quiz-option:hover:not(:disabled){border-color:var(--accent);background:var(--panel2)}
+.quiz-option.correct{border-color:var(--green);background:color-mix(in srgb,var(--green) 12%,var(--panel));color:var(--green);font-weight:650}
+.quiz-option.wrong{border-color:var(--red);background:color-mix(in srgb,var(--red) 11%,var(--panel));color:var(--red)}
+.quiz-option:disabled{cursor:default}
+.quiz-option:disabled:not(.correct):not(.wrong){opacity:.65}
+.quiz-feedback{display:none;padding:12px 14px;background:var(--panel3);border-radius:8px;margin-top:10px;font-size:13px;line-height:1.7;border-left:3px solid var(--accent)}
 .quiz-feedback.show{display:block}
 .quiz-feedback .jp{font-size:15px;font-weight:650;margin:6px 0 2px}
-.quiz-feedback .en{font-size:12px;color:var(--muted)}
-
-/* ---------- Buttons row ---------- */
-.btn-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
-
-/* ---------- Chip / tag ---------- */
-.chip{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;background:var(--panel3);border:1px solid var(--line);color:var(--muted)}
-.chip.accent{border-color:var(--accent);color:var(--accent)}
-
-/* ---------- Search ---------- */
-.search-box{width:100%;padding:10px 12px;border:1px solid var(--line2);border-radius:8px;background:var(--panel3);color:var(--text);outline:none;font-size:13px}
-.search-box:focus{border-color:var(--accent)}
-
-/* ---------- Filter row ---------- */
-.filter-row{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
-.filter-btn{padding:5px 10px;border-radius:6px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:11px;font-weight:650;cursor:pointer}
-.filter-btn.active{background:var(--panel2);border-color:var(--accent);color:var(--accent2)}
-
-/* ---------- Sidebar nav ---------- */
-.side-title{font-size:9px;font-weight:800;letter-spacing:.14em;color:var(--subtle);text-transform:uppercase;margin:12px 6px 6px}
-.side-item{display:block;width:100%;text-align:left;padding:8px 10px;border-radius:7px;border:0;background:transparent;color:var(--muted);font-size:12px;font-weight:550;cursor:pointer;margin-bottom:1px}
-.side-item:hover{background:var(--panel2);color:var(--text)}
-.side-item.active{background:var(--panel2);color:var(--accent);font-weight:700}
-
-/* ---------- Misc ---------- */
-.empty{padding:28px 16px;text-align:center;color:var(--muted);font-size:12px}
-.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);padding:9px 16px;background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:9px;font-size:12px;z-index:50;display:none;box-shadow:var(--shadow);max-width:90vw}
-.toast.show{display:block}
-.pill-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-kbd{font:10px/1 ui-monospace,monospace;border:1px solid var(--line2);border-bottom-width:2px;border-radius:4px;padding:2px 5px;background:var(--panel2);color:var(--text)}
-.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
-.section-head h2{margin:0}
 
 /* ---------- Learning path ---------- */
 .path-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.path-card{border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--panel);cursor:pointer}
-.path-card:hover{border-color:var(--accent)}
-.path-card h3{font-size:14px;margin:0 0 6px}
-.path-card p{font-size:12px;color:var(--muted);margin:0 0 8px}
+.path-card{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:var(--panel);cursor:pointer;transition:border-color .15s,transform .15s}
+.path-card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.path-card h3{font:600 16px/1.3 var(--font-serif);margin:0 0 6px}
+.path-card p{font-size:13px;color:var(--muted);margin:0 0 10px}
 
-/* ---------- Mobile ---------- */
+/* ---------- Misc ---------- */
+.empty{padding:28px 16px;text-align:center;color:var(--muted);font-size:13px;grid-column:1/-1}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);padding:9px 16px;background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:9px;font-size:13px;z-index:50;display:none;box-shadow:var(--shadow);max-width:90vw}
+.toast.show{display:block}
+kbd{font:11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;border:1px solid var(--line2);border-bottom-width:2px;border-radius:4px;padding:2px 5px;background:var(--panel2);color:var(--text)}
+.btn.primary kbd{background:transparent;border-color:color-mix(in srgb,var(--on-primary) 45%,transparent);color:var(--on-primary)}
 .mobile-menu{display:none}
+.sakura-note{margin:14px 6px 4px;line-height:1.8}
+
+/* ---------- Responsive ---------- */
 @media(max-width:900px){
- .layout{grid-template-columns:1fr}
- .sidebar{position:static;max-height:none;display:none}
- .sidebar.open{display:block}
- .mobile-menu{display:inline-flex}
- .grid-3,.grid-4{grid-template-columns:repeat(2,1fr)}
- .path-grid{grid-template-columns:1fr}
+  .layout{grid-template-columns:1fr}
+  .sidebar{position:static;max-height:none;display:none}
+  .sidebar.open{display:block}
+  .mobile-menu{display:inline-flex}
+  .grid-3,.grid-4{grid-template-columns:repeat(2,1fr)}
+  .path-grid{grid-template-columns:1fr}
 }
 @media(max-width:600px){
- .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
- .topbar{padding:9px 12px;gap:10px}
- .brand small{display:none}
- .top-meta{display:none}
- .fc-front .word{font-size:28px}
+  .grid-2,.grid-3{grid-template-columns:1fr}
+  .grid-4{grid-template-columns:repeat(2,1fr)}
+  .stat{padding:12px 14px}
+  .stat .v{font-size:22px}
+  .topbar{padding:9px 12px;gap:10px}
+  .navtabs{padding:0 8px}
+  .brand small,.top-meta,.seg-btn span{display:none}
+  .seg-btn{padding:6px 9px}
+  .fc-front .word{font-size:30px}
+  .filter-group{align-items:flex-start;flex-direction:column;gap:4px}
 }
 
-/* ---------- Print ---------- */
+/* ---------- Print (always light, ink-friendly) ---------- */
 @media print{
- .topbar,.navtabs,.sidebar,.top-actions,.mobile-menu,.toast,.btn-row,.filter-row{display:none!important}
- .layout{display:block;padding:0}
- .card{box-shadow:none;border:1px solid #ccc;break-inside:avoid}
+  :root[data-theme="dark"],:root[data-theme="light"]{--bg:#fff;--panel:#fff;--panel2:#f4f4f4;--panel3:#f8f8f8;--line:#ccc;--line2:#bbb;--text:#000;--muted:#333;--subtle:#555;--accent-ink:#a84a28;--green:#2f5a1e;--blue:#1b4f80;--red:#9a2a20;--kraft:#6b4118;--shadow:none}
+  .topbar,.navtabs,.sidebar,.top-actions,.mobile-menu,.toast,.btn-row,.filter-group,.skip-link{display:none!important}
+  .layout{display:block;padding:0}
+  .card,.vocab-card,.grammar-card{box-shadow:none;break-inside:avoid}
 }
 </style>
 </head>
-<body data-theme="dark">
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<noscript><p style="padding:20px;text-align:center">Kotoba Lab needs JavaScript to run.</p></noscript>
 
 <!-- ================= TOPBAR ================= -->
 <header class="topbar">
  <div class="brand">
-  <div class="brand-mark" aria-hidden="true">桜</div>
-  <div><strong>Japanese Lab</strong><small>JLPT N5 → N4 · JAPANESE LEARNING LAB</small></div>
+  <div class="brand-mark" aria-hidden="true" lang="ja">言</div>
+  <div><strong>Kotoba Lab</strong><small>JLPT N5 → N4 · JAPANESE LEARNING LAB</small></div>
  </div>
  <div class="top-meta">
   <span class="top-chip">N5 + N4</span>
@@ -216,7 +301,16 @@ kbd{font:10px/1 ui-monospace,monospace;border:1px solid var(--line2);border-bott
  </div>
  <div class="top-actions">
   <button type="button" class="btn small mobile-menu" id="mobileMenu" aria-expanded="false" aria-controls="sidebar">☰ Menu</button>
-  <button type="button" class="btn small" id="themeBtn" aria-pressed="false">Light</button>
+  <div class="seg" role="group" aria-label="Colour theme">
+   <button type="button" class="seg-btn" data-theme-choice="light" aria-pressed="false" title="Light mode">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+    <span>Light</span>
+   </button>
+   <button type="button" class="seg-btn" data-theme-choice="dark" aria-pressed="true" title="Dark mode">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    <span>Dark</span>
+   </button>
+  </div>
   <button type="button" class="btn small" id="printBtn">Print</button>
   <button type="button" class="btn small" id="exportBtn">Export</button>
   <button type="button" class="btn small" id="importBtn">Import</button>
@@ -226,7 +320,7 @@ kbd{font:10px/1 ui-monospace,monospace;border:1px solid var(--line2);border-bott
 
 <!-- ================= TABS ================= -->
 <nav class="navtabs" aria-label="Main sections">
- <button type="button" class="navtab active" data-view="dashboard">Dashboard</button>
+ <button type="button" class="navtab active" data-view="dashboard" aria-current="page">Dashboard</button>
  <button type="button" class="navtab" data-view="vocab">Vocabulary</button>
  <button type="button" class="navtab" data-view="grammar">Grammar</button>
  <button type="button" class="navtab" data-view="practice">Practice</button>
@@ -238,45 +332,46 @@ kbd{font:10px/1 ui-monospace,monospace;border:1px solid var(--line2);border-bott
 <div class="layout">
 
 <!-- ================= SIDEBAR ================= -->
-<aside class="sidebar" id="sidebar" aria-label="Navigation">
+<aside class="sidebar" id="sidebar" aria-label="Filters and study tools">
  <div class="side-title">JLPT Level</div>
- <button type="button" class="side-item active" data-level="all">All levels</button>
- <button type="button" class="side-item" data-level="n5">JLPT N5</button>
- <button type="button" class="side-item" data-level="n4">JLPT N4</button>
- <div class="side-title" id="sideTopicTitle">Topics</div>
+ <button type="button" class="side-item active" data-level="all" aria-pressed="true">All levels</button>
+ <button type="button" class="side-item" data-level="n5" aria-pressed="false">JLPT N5</button>
+ <button type="button" class="side-item" data-level="n4" aria-pressed="false">JLPT N4</button>
+ <div class="side-title">Vocabulary topic</div>
  <div id="sideTopics"></div>
  <div class="side-title">Study Tools</div>
  <button type="button" class="side-item" data-goto="flashcards">SRS Flashcards</button>
  <button type="button" class="side-item" data-goto="practice">Quiz / Test</button>
  <button type="button" class="side-item" data-goto="mnemonics">Memory Techniques</button>
- <div class="tiny" style="margin:14px 6px;line-height:1.7">
+ <div class="tiny sakura-note">
   <kbd>/</kbd> search &nbsp; <kbd>Esc</kbd> clear<br>
-  Progress saved in this browser.<br>
+  Flashcards: <kbd>Space</kbd> flip, <kbd>1</kbd>–<kbd>4</kbd> rate<br>
+  Progress is saved in this browser.<br>
   Export a backup anytime.
  </div>
 </aside>
 
 <!-- ================= MAIN ================= -->
-<main class="main">
+<main class="main" id="main">
 
 <!-- ====== DASHBOARD ====== -->
 <section class="view active" id="view-dashboard">
  <div class="eyebrow">Your Japanese journey</div>
- <h1 style="font-size:clamp(22px,3vw,30px);letter-spacing:-.03em;margin:0 0 6px">Welcome to Japanese Lab</h1>
- <p class="lead">A complete, self-contained Japanese learning environment for JLPT N5 and N4. Every vocabulary word, every grammar pattern, with English translations, mnemonics, spaced-repetition flashcards, and interactive quizzes.</p>
+ <h1 class="page-title">Welcome to Kotoba Lab</h1>
+ <p class="lead">A complete, self-contained Japanese learning environment for JLPT N5 and N4. Every vocabulary word and grammar pattern comes with English translations, mnemonics, spaced-repetition flashcards, and interactive quizzes.</p>
 
- <div class="grid-4" style="margin-bottom:14px">
+ <div class="grid-4 mb-14">
   <div class="stat"><div class="k">Vocabulary</div><div class="v" id="dashVocab">—</div><div class="d">N5 + N4 words</div></div>
-  <div class="stat"><div class="k">Grammar</div><div class="v" id="dashGrammar">—</div><div class="d">patterns & structures</div></div>
-  <div class="stat"><div class="k">Completed</div><div class="v" id="dashDone">0 / 0</div><div class="d">words mastered</div></div>
-  <div class="stat"><div class="k">Quiz Score</div><div class="v" id="dashScore">0 / 0</div><div class="d">correct answers</div></div>
+  <div class="stat"><div class="k">Grammar</div><div class="v" id="dashGrammar">—</div><div class="d">patterns &amp; structures</div></div>
+  <div class="stat"><div class="k">Learned</div><div class="v" id="dashDone">0 / 0</div><div class="d">words marked learned</div></div>
+  <div class="stat"><div class="k">Quiz score</div><div class="v" id="dashScore">0 / 0</div><div class="d">correct answers</div></div>
  </div>
 
  <div class="card">
   <div class="section-head"><h2>Your progress</h2><span class="small muted" id="progressPct">0%</span></div>
   <div class="progress-track" role="progressbar" aria-labelledby="progressLabel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressTrack"><div class="progress-fill" id="progressBar"></div></div>
-  <p class="small muted" id="progressLabel" style="margin:8px 0 0">Start with the Vocabulary tab to begin learning N5 words.</p>
-  <div class="btn-row" style="margin-top:12px">
+  <p class="small muted" id="progressLabel" style="margin:8px 0 0">Start with the Vocabulary tab to begin learning words.</p>
+  <div class="btn-row mt-12">
    <button type="button" class="btn primary" id="startVocabBtn">Start learning →</button>
    <button type="button" class="btn" id="startFlashBtn">Quick flashcards</button>
    <button type="button" class="btn" id="startQuizBtn">Take a quiz</button>
@@ -306,7 +401,7 @@ kbd{font:10px/1 ui-monospace,monospace;border:1px solid var(--line2);border-bott
   <div class="path-card" data-goto="practice">
    <div class="eyebrow">Practice</div>
    <h3>Test yourself</h3>
-   <p>Multiple-choice quizzes, fill-in-the-blank, and grammar sentence building. Timed and untimed modes.</p>
+   <p>Multiple-choice quizzes on meanings, readings, reverse look-ups and grammar patterns, at any length you like.</p>
    <button type="button" class="btn small primary">Take a quiz →</button>
   </div>
  </div>
@@ -315,23 +410,22 @@ kbd{font:10px/1 ui-monospace,monospace;border:1px solid var(--line2);border-bott
 <!-- ====== VOCABULARY ====== -->
 <section class="view" id="view-vocab">
  <div class="eyebrow">Vocabulary library</div>
- <h1 style="font-size:clamp(20px,2.5vw,26px);letter-spacing:-.02em;margin:0 0 6px">Vocabulary</h1>
- <p class="lead">Every JLPT N5 and N4 word with kanji, kana reading, English meaning, and a mnemonic hint.</p>
- <input class="search-box" type="search" id="vocabSearch" placeholder="Search by kanji, kana, or English…" aria-label="Search vocabulary">
- <div class="filter-row" id="vocabFilters">
-  <button type="button" class="filter-btn active" data-vlevel="all">All</button>
-  <button type="button" class="filter-btn" data-vlevel="n5">N5</button>
-  <button type="button" class="filter-btn" data-vlevel="n4">N4</button>
-  <button type="button" class="filter-btn" data-vtopic="all">All topics</button>
-  <button type="button" class="filter-btn" data-vtopic="noun">Nouns</button>
-  <button type="button" class="filter-btn" data-vtopic="verb">Verbs</button>
-  <button type="button" class="filter-btn" data-vtopic="adjective">Adjectives</button>
-  <button type="button" class="filter-btn" data-vtopic="adverb">Adverbs</button>
-  <button type="button" class="filter-btn" data-vtopic="expression">Expressions</button>
+ <h1 class="page-title">Vocabulary</h1>
+ <p class="lead">Every JLPT N5 and N4 word with kanji, kana reading, English meaning, and a mnemonic hint. Click a card to reveal its mnemonic.</p>
+ <input class="search-box" type="search" id="vocabSearch" placeholder="Search by kanji, kana, or English…  ( / )" aria-label="Search vocabulary">
+ <div class="filter-group"><span class="filter-label">Level</span>
+  <div class="filter-row">
+   <button type="button" class="filter-btn active" data-level="all" aria-pressed="true">All</button>
+   <button type="button" class="filter-btn" data-level="n5" aria-pressed="false">N5</button>
+   <button type="button" class="filter-btn" data-level="n4" aria-pressed="false">N4</button>
+  </div>
+ </div>
+ <div class="filter-group"><span class="filter-label">Topic</span>
+  <div class="filter-row" id="vocabTopicFilters"></div>
  </div>
  <div class="small muted" id="vocabShown" style="margin-bottom:10px"></div>
  <div id="vocabList"></div>
- <div class="btn-row" style="margin-top:12px">
+ <div class="btn-row mt-12">
   <button type="button" class="btn" id="loadMoreVocab">Load more</button>
  </div>
 </section>
@@ -339,117 +433,115 @@ kbd{font:10px/1 ui-monospace,monospace;border:1px solid var(--line2);border-bott
 <!-- ====== GRAMMAR ====== -->
 <section class="view" id="view-grammar">
  <div class="eyebrow">Grammar reference</div>
- <h1 style="font-size:clamp(20px,2.5vw,26px);letter-spacing:-.02em;margin:0 0 6px">Grammar</h1>
- <p class="lead">All JLPT N5 and N4 grammar patterns with structure, meaning, examples, English translation, and memory aids.</p>
+ <h1 class="page-title">Grammar</h1>
+ <p class="lead">All JLPT N5 and N4 grammar patterns with structure, meaning, examples, English translation, and memory aids. Click a card to reveal its mnemonic.</p>
  <input class="search-box" type="search" id="grammarSearch" placeholder="Search grammar patterns…" aria-label="Search grammar">
- <div class="filter-row" id="grammarFilters">
-  <button type="button" class="filter-btn active" data-glevel="all">All</button>
-  <button type="button" class="filter-btn" data-glevel="n5">N5</button>
-  <button type="button" class="filter-btn" data-glevel="n4">N4</button>
+ <div class="filter-group"><span class="filter-label">Level</span>
+  <div class="filter-row">
+   <button type="button" class="filter-btn active" data-level="all" aria-pressed="true">All</button>
+   <button type="button" class="filter-btn" data-level="n5" aria-pressed="false">N5</button>
+   <button type="button" class="filter-btn" data-level="n4" aria-pressed="false">N4</button>
+  </div>
  </div>
  <div class="small muted" id="grammarShown" style="margin-bottom:10px"></div>
  <div id="grammarList"></div>
+ <div class="btn-row mt-12">
+  <button type="button" class="btn" id="loadMoreGrammar">Load more</button>
+ </div>
 </section>
 
 <!-- ====== PRACTICE ====== -->
 <section class="view" id="view-practice">
  <div class="eyebrow">Test your knowledge</div>
- <h1 style="font-size:clamp(20px,2.5vw,26px);letter-spacing:-.02em;margin:0 0 6px">Practice & Quizzes</h1>
- <p class="lead">Multiple-choice quizzes, fill-in-the-blank, and grammar exercises. Choose a mode below.</p>
+ <h1 class="page-title">Practice &amp; Quizzes</h1>
+ <p class="lead">Multiple-choice quizzes on vocabulary meanings, kanji readings, English → Japanese look-ups, and grammar patterns.</p>
 
- <div class="card" style="margin-bottom:14px">
+ <div class="card mb-14">
   <div class="section-head"><h2>Quiz settings</h2><span class="small muted" id="practiceScore">Score: 0 / 0</span></div>
   <div class="grid-3" style="gap:10px">
-   <div><label class="tiny" for="quizType" style="display:block;margin-bottom:4px">Question type</label>
-    <select id="quizType" style="width:100%;padding:8px;border-radius:7px;border:1px solid var(--line2);background:var(--panel3);color:var(--text)">
+   <div class="field"><label for="quizType">Question type</label>
+    <select id="quizType">
      <option value="mixed">Mixed (all types)</option>
      <option value="meaning">Meaning: Japanese → English</option>
      <option value="reading">Reading: Kanji → Kana</option>
      <option value="reverse">Reverse: English → Japanese</option>
      <option value="grammar">Grammar patterns</option>
     </select></div>
-   <div><label class="tiny" for="quizLevel" style="display:block;margin-bottom:4px">Level</label>
-    <select id="quizLevel" style="width:100%;padding:8px;border-radius:7px;border:1px solid var(--line2);background:var(--panel3);color:var(--text)">
+   <div class="field"><label for="quizLevel">Level</label>
+    <select id="quizLevel">
      <option value="all">All levels</option>
      <option value="n5">JLPT N5</option>
      <option value="n4">JLPT N4</option>
     </select></div>
-   <div><label class="tiny" for="quizCount" style="display:block;margin-bottom:4px">Questions</label>
-    <select id="quizCount" style="width:100%;padding:8px;border-radius:7px;border:1px solid var(--line2);background:var(--panel3);color:var(--text)">
+   <div class="field"><label for="quizCount">Questions</label>
+    <select id="quizCount">
      <option value="10">10</option>
      <option value="20" selected>20</option>
      <option value="30">30</option>
      <option value="50">50</option>
     </select></div>
   </div>
-  <div class="btn-row" style="margin-top:12px">
+  <div class="btn-row mt-12">
    <button type="button" class="btn primary" id="startQuiz">Generate quiz</button>
    <button type="button" class="btn" id="clearQuiz">Clear</button>
   </div>
  </div>
 
- <div id="quizArea"></div>
+ <div id="quizArea"><div class="card empty">Pick your settings above and press <strong>Generate quiz</strong>.</div></div>
 </section>
 
 <!-- ====== FLASHCARDS ====== -->
 <section class="view" id="view-flashcards">
  <div class="eyebrow">Spaced repetition system</div>
- <h1 style="font-size:clamp(20px,2.5vw,26px);letter-spacing:-.02em;margin:0 0 6px">Flashcards</h1>
+ <h1 class="page-title">Flashcards</h1>
  <p class="lead">Review words using a spaced-repetition algorithm. Rate each card honestly — the scheduler adjusts review intervals based on your recall quality.</p>
 
- <div class="card" style="margin-bottom:14px">
+ <div class="card mb-14">
   <div class="section-head">
-   <h2 style="margin:0">Study session</h2>
+   <h2>Study session</h2>
    <span class="small muted" id="srsStatus">Ready</span>
   </div>
-  <div class="grid-3" style="gap:10px;margin-bottom:12px">
-   <div><label class="tiny" for="srsLevel" style="display:block;margin-bottom:4px">Level</label>
-    <select id="srsLevel" style="width:100%;padding:8px;border-radius:7px;border:1px solid var(--line2);background:var(--panel3);color:var(--text)">
+  <div class="grid-3" style="gap:10px">
+   <div class="field"><label for="srsLevel">Level</label>
+    <select id="srsLevel">
      <option value="all">All levels</option>
      <option value="n5">JLPT N5</option>
      <option value="n4">JLPT N4</option>
     </select></div>
-   <div><label class="tiny" for="srsTopic" style="display:block;margin-bottom:4px">Topic</label>
-    <select id="srsTopic" style="width:100%;padding:8px;border-radius:7px;border:1px solid var(--line2);background:var(--panel3);color:var(--text)">
-     <option value="all">All topics</option>
-     <option value="noun">Nouns</option>
-     <option value="verb">Verbs</option>
-     <option value="adjective">Adjectives</option>
-     <option value="adverb">Adverbs</option>
-     <option value="expression">Expressions</option>
-    </select></div>
-   <div><label class="tiny" for="srsMode" style="display:block;margin-bottom:4px">Card direction</label>
-    <select id="srsMode" style="width:100%;padding:8px;border-radius:7px;border:1px solid var(--line2);background:var(--panel3);color:var(--text)">
+   <div class="field"><label for="srsTopic">Topic</label>
+    <select id="srsTopic"></select></div>
+   <div class="field"><label for="srsMode">Card direction</label>
+    <select id="srsMode">
      <option value="jp-en">Japanese → English</option>
      <option value="en-jp">English → Japanese</option>
     </select></div>
   </div>
-  <div class="btn-row">
+  <div class="btn-row mt-12">
    <button type="button" class="btn primary" id="startSrs">Start / Resume</button>
    <button type="button" class="btn" id="srsShuffle">Shuffle deck</button>
    <button type="button" class="btn" id="srsReset">Reset SRS</button>
   </div>
  </div>
 
- <div id="srsArea"></div>
+ <div id="srsArea"><div class="card empty">Choose your settings, then press <strong>Start / Resume</strong>.</div></div>
 </section>
 
 <!-- ====== MNEMONICS / MEMORY LAB ====== -->
 <section class="view" id="view-mnemonics">
  <div class="eyebrow">Memory techniques</div>
- <h1 style="font-size:clamp(20px,2.5vw,26px);letter-spacing:-.02em;margin:0 0 6px">Memory Lab</h1>
+ <h1 class="page-title">Memory Lab</h1>
  <p class="lead">Research-backed techniques to remember Japanese faster and longer. Each method includes a practical example you can apply immediately.</p>
 
  <div class="grid-2" id="mnemonicGrid"></div>
 
  <div class="card" style="margin-top:14px">
   <h2>How to use mnemonics</h2>
-  <ol style="padding-left:20px;margin:8px 0;color:var(--muted);font-size:13px;line-height:1.9">
-   <li><strong>Make it vivid.</strong> The funnier, stranger, or more exaggerated the image, the stronger the memory. A ridiculous image beats a sensible one.</li>
-   <li><strong>Use all your senses.</strong> Imagine the sound, smell, texture, and motion of the scene, not just the visual.</li>
-   <li><strong>Link sound to meaning.</strong> Connect the Japanese sounds to an English word or image that sounds similar.</li>
-   <li><strong>Rehearse briefly and often.</strong> Say the mnemonic aloud 3–5 times over spaced intervals. Each recall strengthens the connection.</li>
-   <li><strong>Combine with SRS.</strong> Use the Flashcards tab to review words at expanding intervals. Mnemonics help encoding; SRS handles retention.</li>
+  <ol style="padding-left:20px;margin:8px 0;color:var(--muted);font-size:14px;line-height:1.9">
+   <li><strong style="color:var(--text)">Make it vivid.</strong> The funnier, stranger, or more exaggerated the image, the stronger the memory. A ridiculous image beats a sensible one.</li>
+   <li><strong style="color:var(--text)">Use all your senses.</strong> Imagine the sound, smell, texture, and motion of the scene, not just the visual.</li>
+   <li><strong style="color:var(--text)">Link sound to meaning.</strong> Connect the Japanese sounds to an English word or image that sounds similar.</li>
+   <li><strong style="color:var(--text)">Rehearse briefly and often.</strong> Say the mnemonic aloud 3–5 times over spaced intervals. Each recall strengthens the connection.</li>
+   <li><strong style="color:var(--text)">Combine with SRS.</strong> Use the Flashcards tab to review words at expanding intervals. Mnemonics help encoding; SRS handles retention.</li>
   </ol>
  </div>
 </section>
@@ -466,7 +558,7 @@ kbd{font:10px/1 ui-monospace,monospace;border:1px solid var(--line2);border-bott
    1. DATA: JLPT N5 + N4 VOCABULARY
    Format: [kanji, kana, english, level, topic, mnemonic]
    ===================================================================== */
-const vocabulary = [
+const vocabularyRaw = [
 /* ---------- N5 NOUNS ---------- */
 ["私","わたし","I; me","n5","noun","Picture yourself pointing at your own chest."],
 ["あなた","あなた","you","n5","noun","Sounds like “anata” — imagine “another” person facing you."],
@@ -504,7 +596,7 @@ const vocabulary = [
 ["お茶","おちゃ","tea","n5","noun","“Ocha” — imagine “oh, cha!” when sipping tea."],
 ["ご飯","ごはん","rice; meal","n5","noun","“Gohan” — imagine “go on” and eat your rice."],
 ["肉","にく","meat","n5","noun","The kanji shows meat inside a person’s ribs."],
-["魚","さかな","fish","n5","noun","“Sakana” — a fish named “Sakana”.”"],
+["魚","さかな","fish","n5","noun","“Sakana” — a fish named “Sakana”."],
 ["野菜","やさい","vegetables","n5","noun","“Ya” field + “sai” vegetables."],
 ["果物","くだもの","fruit","n5","noun","“Kudamono” — “could a mono” be a fruit?"],
 ["店","みせ","shop","n5","noun","The kanji shows a shop with a roof and a counter."],
@@ -603,7 +695,6 @@ const vocabulary = [
 ["帰る","かえる","to return; to go home","n5","verb","“Kaeru” — imagine “kaeru” the frog returns home."],
 ["入る","はいる","to enter","n5","verb","“Hairu” — imagine “hair” entering the door."],
 ["出る","でる","to exit; to leave","n5","verb","“Deru” — imagine “dare you” to leave."],
-["飲む","のむ","to drink","n5","verb","“Nomu” — imagine “no mo” drink."],
 ["撮る","とる","to take (a photo)","n5","verb","“Toru” — imagine “tore” a photo."],
 ["呼ぶ","よぶ","to call","n5","verb","“Yobu” — imagine “yo boo” call me."],
 ["会う","あう","to meet","n5","verb","“Au” — imagine “a u” meeting."],
@@ -692,7 +783,6 @@ const vocabulary = [
 ["贈り物","おくりもの","gift","n4","noun","“Okurimono” — “okuri” send + “mono” thing."],
 ["押し入れ","おしいれ","closet","n4","noun","“Oshiire” — “oshi” push + “ire” put in."],
 ["お嬢さん","おじょうさん","young lady","n4","noun","“Ojousan” — imagine “oh joe san” young lady."],
-["夫","おっと","husband","n4","noun","“Otto” — imagine a husband named Otto."],
 ["おつり","おつり","change (from purchase)","n4","noun","“Otsuri” — imagine “oh tsur ee” change."],
 ["音","おと","sound; note","n4","noun","“Oto” — imagine “oh toe” sound."],
 ["踊り","おどり","a dance","n4","noun","“Odori” — from “odoru” (to dance)."],
@@ -723,8 +813,6 @@ const vocabulary = [
 ["紙","かみ","paper","n4","noun","“Kami” — imagine “ka me” paper."],
 ["彼女","かのじょ","she; girlfriend","n4","noun","“Kanojo” — imagine “ka no jo” her."],
 ["彼","かれ","he; boyfriend","n4","noun","“Kare” — imagine “ka ray” him."],
-["川","かわ","river","n4","noun","“Kawa” — imagine “ka wa” river."],
-["可愛がる","かわいがる","to love; to cherish","n4","verb","“Kawaigaru” — from “kawaii” cute."],
 ["感覚","かんかく","sense; sensation","n4","noun","“Kankaku” — imagine “kan ka ku” sense."],
 ["関係","かんけい","relationship","n4","noun","“Kankei” — imagine “kan kay” relation."],
 ["看護師","かんごし","nurse","n4","noun","“Kangoshi” — “kango” nursing + “shi” person."],
@@ -753,7 +841,6 @@ const vocabulary = [
 ["決心","けっしん","determination","n4","noun","“Kesshin” — imagine “kesh in” determination."],
 ["欠席","けっせき","absence","n4","noun","“Kesseki” — imagine “kes sek ee” absence."],
 ["結果","けっか","result","n4","noun","“Kekka” — imagine “kek ka” result."],
-["結婚","けっこん","marriage","n4","noun","“Kekkon” — imagine “kek kon” marriage."],
 ["建築","けんちく","architecture","n4","noun","“Kenchiku” — imagine “ken chee ku” building."],
 ["原因","げんいん","cause","n4","noun","“Genin” — imagine “gen in” cause."],
 ["喧嘩","けんか","quarrel","n4","noun","“Kenka” — imagine “ken ka” fight."],
@@ -765,7 +852,6 @@ const vocabulary = [
 ["高校","こうこう","high school","n4","noun","“Koukou” — imagine “ko ko” high school."],
 ["交通","こうつう","traffic; transportation","n4","noun","“Koutsuu” — imagine “ko tsu” traffic."],
 ["声","こえ","voice","n4","noun","“Koe” — imagine “ko eh” voice."],
-["心","こころ","heart; mind","n4","noun","“Kokoro” — imagine “ko ko ro” heart."],
 ["国際","こくさい","international","n4","noun","“Kokusai” — imagine “ko ku sai” international."],
 ["黒","くろ","black","n4","noun","“Kuro” — imagine “koo ro” black."],
 ["今度","こんど","next time","n4","noun","“Kondo” — imagine “kon do” next."],
@@ -793,7 +879,6 @@ const vocabulary = [
 ["仕方","しかた","way; method","n4","noun","“Shikata” — “shi” do + “kata” way."],
 ["試験","しけん","exam","n4","noun","“Shiken” — imagine “she ken” exam."],
 ["事故","じこ","accident","n4","noun","“Jiko” — imagine “gee ko” accident."],
-["仕事","しごと","work; job","n4","noun","“Shigoto” — “shi” do + “goto” thing."],
 ["地震","じしん","earthquake","n4","noun","“Jishin” — “ji” earth + “shin” shake."],
 ["時代","じだい","era; period","n4","noun","“Jidai” — imagine “gee die” era."],
 ["下着","したぎ","underwear","n4","noun","“Shitagi” — “shita” under + “gi” wear."],
@@ -801,10 +886,8 @@ const vocabulary = [
 ["実験","じっけん","experiment","n4","noun","“Jikken” — imagine “gee ken” experiment."],
 ["実際","じっさい","actually; in fact","n4","noun","“Jissai” — imagine “gee sigh” actually."],
 ["失敗","しっぱい","failure; mistake","n4","noun","“Shippai” — imagine “ship pie” failure."],
-["質問","しつもん","question","n4","noun","“Shitsumon” — “shitsu” quality + “mon” ask."],
 ["湿度","しつど","humidity","n4","noun","“Shitsudo” — “shitsu” moisture + “do” degree."],
 ["品物","しなもの","goods; item","n4","noun","“Shinamono” — “shina” item + “mono” thing."],
-["失敗","しっぱい","mistake","n4","noun","“Shippai” — imagine “ship pie” mistake."],
 ["島","しま","island","n4","noun","“Shima” — imagine “she ma” island."],
 ["市民","しみん","citizen","n4","noun","“Shimin” — imagine “she min” citizen."],
 ["事務所","じむしょ","office","n4","noun","“Jimusho” — “jimu” business + “sho” place."],
@@ -828,14 +911,12 @@ const vocabulary = [
 ["初め","はじめ","beginning","n4","noun","“Hajime” — imagine “ha jee may” beginning."],
 ["初めて","はじめて","for the first time","n4","adverb","“Hajimete” — imagine “ha jee may tay” first time."],
 ["場所","ばしょ","place; location","n4","noun","“Basho” — imagine “bah show” place."],
-["働く","はたらく","to work","n4","verb","“Hataraku” — imagine “hot rack” at work."],
 ["花見","はなみ","flower viewing","n4","noun","“Hanami” — “hana” flower + “mi” see."],
 ["林","はやし","woods; forest","n4","noun","“Hayashi” — imagine “ha ya she” forest."],
 ["払う","はらう","to pay","n4","verb","“Harau” — imagine “ha rao” pay."],
 ["番組","ばんぐみ","TV program","n4","noun","“Bangumi” — “ban” number + “gumi” group."],
 ["引き出し","ひきだし","drawer","n4","noun","“Hikidashi” — “hiki” pull + “dashi” out."],
 ["美術館","びじゅつかん","art museum","n4","noun","“Bijutsukan” — “bijutsu” art + “kan” building."],
-["病気","びょうき","illness","n4","noun","“Byouki” — “byou” sick + “ki” spirit."],
 ["昼間","ひるま","daytime","n4","noun","“Hiruma” — “hiru” noon + “ma” interval."],
 ["拾う","ひろう","to pick up","n4","verb","“Hiroku” — imagine “he row” pick up."],
 ["増える","ふえる","to increase","n4","verb","“Fueru” — imagine “foo eh roo” increase."],
@@ -856,8 +937,6 @@ const vocabulary = [
 ["翻訳","ほんやく","translation","n4","noun","“Honyaku” — “hon” book + “yaku” translate."],
 ["参る","まいる","to go (humble)","n4","verb","“Mairu” — humble “go”."],
 ["負ける","まける","to lose","n4","verb","“Makeru” — imagine “ma care” lose."],
-["負ける","まける","to lose","n4","verb","“Makeru” — imagine “ma care” lose."],
-["まだ","まだ","not yet","n4","adverb","“Mada” — imagine “ma da” not yet."],
 ["町","まち","town","n4","noun","“Machi” — imagine “ma chee” town."],
 ["間違える","まちがえる","to make a mistake","n4","verb","“Machigaeru” — “machi” town + “gaeru” change."],
 ["間に合う","まにあう","to be in time","n4","verb","“Maniau” — imagine “ma nee ow” in time."],
@@ -875,7 +954,6 @@ const vocabulary = [
 ["息子","むすこ","son","n4","noun","“Musuko” — imagine “moo sue ko” son."],
 ["娘","むすめ","daughter","n4","noun","“Musume” — imagine “moo sue may” daughter."],
 ["無理","むり","impossible; unreasonable","n4","adjective","“Muri” — imagine “moo ree” impossible."],
-["目","め","eye","n4","noun","The kanji is a vertical eye."],
 ["飯","めし","meal; cooked rice","n4","noun","“Meshi” — imagine “mesh ee” meal."],
 ["申し込む","もうしこむ","to apply for","n4","verb","“Moushikomu” — imagine “mo she ko moo” apply."],
 ["もしもし","もしもし","hello (phone)","n4","expression","“Moshimoshi” — imagine “mo she mo she” hello."],
@@ -893,7 +971,6 @@ const vocabulary = [
 ["役に立つ","やくにたつ","to be useful","n4","expression","“Yakunitatsu” — imagine “ya coo nee tat sue” useful."],
 ["焼ける","やける","to be burned","n4","verb","“Yakeru” — from “yaku” (to burn)."],
 ["優しい","やさしい","kind; gentle","n4","adjective","“Yasashii” — imagine “ya sa she” kind."],
-["安い","やすい","cheap","n4","adjective","“Yasui” — imagine “yes easy” cheap."],
 ["雇う","やとう","to employ","n4","verb","“Yatou” — imagine “ya toe” employ."],
 ["屋根","やね","roof","n4","noun","“Yane” — imagine “ya nay” roof."],
 ["やはり","やはり","as expected","n4","adverb","“Yahari” — imagine “ya ha ree” as expected."],
@@ -905,7 +982,6 @@ const vocabulary = [
 ["輸入","ゆにゅう","import","n4","noun","“Yunyuu” — imagine “you new” import."],
 ["指","ゆび","finger","n4","noun","“Yubi” — imagine “you bee” finger."],
 ["夢","ゆめ","dream","n4","noun","“Yume” — imagine “you may” dream."],
-["有名","ゆうめい","famous","n4","adjective","“Yuumei” — imagine “you may” famous."],
 ["許す","ゆるす","to forgive","n4","verb","“Yurusu” — imagine “you roo sue” forgive."],
 ["用意","ようい","preparation","n4","noun","“Youi” — imagine “yo ee” prepare."],
 ["用事","ようじ","errand; business","n4","noun","“Youji” — imagine “yo gee” errand."],
@@ -915,7 +991,6 @@ const vocabulary = [
 ["理由","りゆう","reason","n4","noun","“Riyuu” — imagine “ree you” reason."],
 ["利用","りよう","use; utilization","n4","noun","“Riyou” — imagine “ree yo” use."],
 ["両方","りょうほう","both","n4","noun","“Ryouhou” — imagine “ryo ho” both."],
-["旅行","りょこう","travel","n4","noun","“Ryokou” — imagine “ryo ko” travel."],
 ["留守","るす","absence from home","n4","noun","“Rusu” — imagine “roo sue” away."],
 ["冷房","れいぼう","air conditioning","n4","noun","“Reibou” — imagine “ray bo” cooling."],
 ["歴史","れきし","history","n4","noun","“Rekishi” — imagine “rek key she” history."],
@@ -925,13 +1000,10 @@ const vocabulary = [
 ["別れる","わかれる","to part; to separate","n4","verb","“Wakareru” — imagine “wa ka reh roo” separate."],
 ["沸く","わく","to boil","n4","verb","“Waku” — imagine “wa coo” boil."],
 ["訳","わけ","reason; meaning","n4","noun","“Wake” — imagine “wa keh” reason."],
-["忘れる","わすれる","to forget","n4","verb","“Wasureru” — imagine “wa sue reh roo” forget."],
-["私","わたし","I; me","n4","noun","“Watashi” — imagine “wa ta she” me."],
 ["渡す","わたす","to hand over","n4","verb","“Watasu” — imagine “wa ta sue” hand over."],
 ["渡る","わたる","to cross","n4","verb","“Wataru” — imagine “wa ta roo” cross."],
 ["笑う","わらう","to laugh","n4","verb","“Warau” — imagine “wa rao” laugh."],
 ["割る","わる","to divide","n4","verb","“Waru” — imagine “wa roo” divide."],
-["悪い","わるい","bad","n4","adjective","“Warui” — imagine “war” bad."],
 ["枠","わく","frame","n4","noun","“Waku” — imagine “wa coo” frame."],
 ["湾","わん","bay","n4","noun","“Wan” — imagine “one” bay."],
 ["アイスクリーム","アイスクリーム","ice cream","n4","noun","“Aisukuriimu” — sounds like “ice cream”."],
@@ -940,8 +1012,6 @@ const vocabulary = [
 ["アルコール","アルコール","alcohol","n4","noun","“Arukooru” — sounds like “alcohol”."],
 ["アルバイト","アルバイト","part-time job","n4","noun","“Arubaito” — from German “Arbeit” (work)."],
 ["エスカレーター","エスカレーター","escalator","n4","noun","Sounds like “escalator”."],
-["カーテン","カーテン","curtain","n4","noun","Sounds like “curtain”."],
-["ガス","ガス","gas","n4","noun","Sounds like “gas”."],
 ["ガソリン","ガソリン","gasoline","n4","noun","Sounds like “gasoline”."],
 ["ガラス","ガラス","glass","n4","noun","Sounds like “glass”."],
 ["カレー","カレー","curry","n4","noun","Sounds like “curry”."],
@@ -1002,7 +1072,6 @@ const vocabulary = [
 
 /* =====================================================================
    2. DATA: JLPT N5 + N4 GRAMMAR
-   Format: {pattern, level, meaning, structure, exampleJp, exampleEn, mnemonic, topic}
    ===================================================================== */
 const grammar = [
 /* ---------- N5 GRAMMAR ---------- */
@@ -1079,7 +1148,7 @@ const grammar = [
 {pattern:"〜ようになる",level:"n4",meaning:"Come to be able to … / reach a state",structure:"[dictionary/nai form] + ようになる",exampleJp:"日本語が話せるようになりました。",exampleEn:"I’ve become able to speak Japanese.",mnemonic:"ようになる = “become the state of.” Think: “you-ni naru = grow into.”",topic:"Change"},
 {pattern:"〜こと",level:"n4",meaning:"Nominaliser (turning verb into noun)",structure:"[dictionary form] + こと",exampleJp:"趣味は本を読むことです。",exampleEn:"My hobby is reading books.",mnemonic:"こと = “thing.” Think: “koto = abstract thing.”",topic:"Nominalisation"},
 {pattern:"〜の",level:"n4",meaning:"Nominaliser (casual / sensory)",structure:"[dictionary form] + の",exampleJp:"音楽を聞くのが好きです。",exampleEn:"I like listening to music.",mnemonic:"の = “one/thing.” Think: “no = the act of.”",topic:"Nominalisation"},
-{pattern:"〜という",level:"n4",meaning:"Called / named / that …",structure:"[noun] という [noun]",exampleJp:"これは「さくら」という花です。",exampleEn:"This is a flower called “Japanese.”",mnemonic:"という = “called.” Think: “to-iu = they say/name.”",topic:"Description"},
+{pattern:"〜という",level:"n4",meaning:"Called / named / that …",structure:"[noun] という [noun]",exampleJp:"これは「さくら」という花です。",exampleEn:"This is a flower called “sakura.”",mnemonic:"という = “called.” Think: “to-iu = they say/name.”",topic:"Description"},
 {pattern:"〜とか〜とか",level:"n4",meaning:"Things like … and …",structure:"[noun] とか [noun] とか",exampleJp:"果物とか野菜とかを買いました。",exampleEn:"I bought fruits, vegetables, and such.",mnemonic:"とか = “things like.” Think: “to-ka = or something.”",topic:"Listing"},
 {pattern:"〜だけでなく",level:"n4",meaning:"Not only … but also",structure:"[noun/plain form] + だけでなく",exampleJp:"英語だけでなく、フランス語も話せます。",exampleEn:"I can speak not only English but also French.",mnemonic:"だけ = “only,” でなく = “not.” Think: “not only.”",topic:"Conjunctions"},
 {pattern:"〜くらい / 〜ぐらい",level:"n4",meaning:"About / approximately",structure:"[quantity] くらい / ぐらい",exampleJp:"10分ぐらい待ってください。",exampleEn:"Please wait about 10 minutes.",mnemonic:"ぐらい = “about.” Think: “gurai = roughly.”",topic:"Approximation"},
@@ -1137,10 +1206,6 @@ const grammar = [
 {pattern:"〜ようにしている",level:"n4",meaning:"Make it a habit to …",structure:"[dictionary/nai form] + ようにしている",exampleJp:"毎日野菜を食べるようにしています。",exampleEn:"I make it a habit to eat vegetables daily.",mnemonic:"ようにしている = “doing in the direction of.” Think: “I try to make a habit.”",topic:"Habits"},
 {pattern:"〜ように言う",level:"n4",meaning:"Tell someone to …",structure:"[dictionary/nai form] + ように言う",exampleJp:"先生は静かにするように言いました。",exampleEn:"The teacher told us to be quiet.",mnemonic:"ように言う = “say to do.” Think: “instruct.”",topic:"Commands"},
 {pattern:"〜ように頼む",level:"n4",meaning:"Ask someone to …",structure:"[dictionary/nai form] + ように頼む",exampleJp:"友達に手伝うように頼みました。",exampleEn:"I asked my friend to help.",mnemonic:"ように頼む = “ask to do.” Think: “request.”",topic:"Requests"},
-{pattern:"〜ようにする",level:"n4",meaning:"Try to / make sure to …",structure:"[dictionary/nai form] + ようにする",exampleJp:"遅れないようにしてください。",exampleEn:"Please try not to be late.",mnemonic:"ようにする = “do so that.” Think: “make an effort.”",topic:"Effort"},
-{pattern:"〜ようになる",level:"n4",meaning:"Become able to / come to …",structure:"[dictionary/nai form] + ようになる",exampleJp:"日本語が読めるようになりました。",exampleEn:"I’ve become able to read Japanese.",mnemonic:"ようになる = “become the state of.” Think: “grow into.”",topic:"Change"},
-{pattern:"〜ことになる",level:"n4",meaning:"It turns out that / has been decided",structure:"[dictionary/nai form] + ことになる",exampleJp:"来月結婚することになりました。",exampleEn:"It has been decided that I’ll get married next month.",mnemonic:"ことになる = “it becomes a thing.” Think: “decision made.”",topic:"Decision"},
-{pattern:"〜ことにする",level:"n4",meaning:"I decide to …",structure:"[dictionary/nai form] + ことにする",exampleJp:"毎日運動することにしました。",exampleEn:"I decided to exercise every day.",mnemonic:"ことにする = “I make it a thing.” Think: “my decision.”",topic:"Decision"},
 {pattern:"〜ことにしている",level:"n4",meaning:"I make it a rule to …",structure:"[dictionary/nai form] + ことにしている",exampleJp:"朝は必ず新聞を読むことにしています。",exampleEn:"I make it a rule to read the newspaper every morning.",mnemonic:"ことにしている = “established as a thing.” Think: “my rule.”",topic:"Habits"},
 {pattern:"〜ことはない",level:"n4",meaning:"There is no need to …",structure:"[dictionary form] + ことはない",exampleJp:"心配することはありません。",exampleEn:"There’s no need to worry.",mnemonic:"ことはない = “there is no thing.” Think: “no need.”",topic:"Advice"},
 {pattern:"〜ことは〜が",level:"n4",meaning:"It is true that … but",structure:"[clause] ことは [clause] が",exampleJp:"美味しいことは美味しいですが、高いです。",exampleEn:"It is true that it’s delicious, but it’s expensive.",mnemonic:"ことは…が = “it is … but.” Think: “granted, however.”",topic:"Conjunctions"},
@@ -1162,8 +1227,6 @@ const grammar = [
 {pattern:"〜でも",level:"n4",meaning:"Even / or something",structure:"[noun] + でも",exampleJp:"お茶でも飲みませんか。",exampleEn:"Would you like some tea or something?",mnemonic:"でも = “even/or.” Think: “demo = such as.”",topic:"Emphasis"},
 {pattern:"〜まで (even)",level:"n4",meaning:"Even / as far as",structure:"[noun] + まで",exampleJp:"彼は嘘までつきました。",exampleEn:"He even told a lie.",mnemonic:"まで = “even.” Think: “made = as far as.”",topic:"Emphasis"},
 {pattern:"〜だけあって",level:"n4",meaning:"As expected of / befitting",structure:"[plain form] + だけあって",exampleJp:"さすがプロだけあって、上手です。",exampleEn:"As expected of a pro, they’re skilled.",mnemonic:"だけあって = “only because.” Think: “befitting.”",topic:"Reason"},
-{pattern:"〜おかげで",level:"n4",meaning:"Thanks to",structure:"[noun/plain form] + おかげで",exampleJp:"先生のおかげで、合格しました。",exampleEn:"Thanks to my teacher, I passed.",mnemonic:"おかげで = “thanks to.” Think: “under the favour of.”",topic:"Reason"},
-{pattern:"〜せいで",level:"n4",meaning:"Because of (negative)",structure:"[noun/plain form] + せいで",exampleJp:"雨のせいで、遅れました。",exampleEn:"Because of the rain, I was late.",mnemonic:"せいで = “blame.” Think: “fault of.”",topic:"Reason"},
 {pattern:"〜おかげさまで",level:"n4",meaning:"Thanks to you / fortunately",structure:"〜おかげさまで",exampleJp:"おかげさまで、元気です。",exampleEn:"Thanks to you, I’m well.",mnemonic:"おかげさまで = “thanks to you.” Think: “grateful.”",topic:"Reason"}
 ];
 
@@ -1186,24 +1249,50 @@ const mnemonicTechniques = [
 ];
 
 /* =====================================================================
+   3b. DERIVED DATA
+   ===================================================================== */
+const vocabulary = (() => {
+  const seen = new Set();
+  return vocabularyRaw.filter(w => {
+    const k = w[0] + "|" + w[1];
+    if(seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+})();
+const vocabKey = w => w[0] + "|" + w[1];
+const vocabByKey = new Map(vocabulary.map(w => [vocabKey(w), w]));
+
+const LEVELS = ["all", "n5", "n4"];
+const TOPICS = [
+  ["all", "All topics"], ["noun", "Nouns"], ["verb", "Verbs"],
+  ["adjective", "Adjectives"], ["adverb", "Adverbs"], ["expression", "Expressions"]
+];
+const TOPIC_IDS = TOPICS.map(t => t[0]);
+const VIEWS = ["dashboard", "vocab", "grammar", "practice", "flashcards", "mnemonics"];
+
+/* =====================================================================
    4. SRS ENGINE (SM-2 inspired)
    ===================================================================== */
-const SRS_DEFAULTS = {ease:2.5,interval:0,repetitions:0,due:0};
+const SRS_DEFAULTS = {ease: 2.5, interval: 0, repetitions: 0, due: 0};
 
 function srsUpdate(card, quality){
-  // quality: 0=again, 1=hard, 2=good, 3=easy
-  const q = quality;
-  if(q === 0){
+  // quality: 0 = again, 1 = hard, 2 = good, 3 = easy
+  const ease = card.ease || 2.5;
+  const prev = card.interval || 0;
+  const reps = card.repetitions || 0;
+  if(quality === 0){
     card.repetitions = 0;
     card.interval = 1;
+    card.ease = Math.max(1.3, ease - 0.2);
   }else{
-    card.repetitions = (card.repetitions || 0) + 1;
-    if(card.repetitions === 1) card.interval = 1;
-    else if(card.repetitions === 2) card.interval = 3;
-    else card.interval = Math.round((card.interval || 1) * (card.ease || 2.5));
-    // quality adjustment
-    if(q === 1) card.ease = Math.max(1.3, (card.ease || 2.5) - 0.15);
-    if(q === 3) card.ease = Math.min(3.0, (card.ease || 2.5) + 0.1);
+    card.repetitions = reps + 1;
+    const mult = quality === 1 ? 1.2 : quality === 3 ? ease * 1.3 : ease;
+    if(reps === 0)      card.interval = quality === 3 ? 3 : 1;
+    else if(reps === 1) card.interval = quality === 1 ? 2 : quality === 3 ? 5 : 3;
+    else                card.interval = Math.max(prev + 1, Math.round(prev * mult));
+    if(quality === 1) card.ease = Math.max(1.3, ease - 0.15);
+    if(quality === 3) card.ease = Math.min(3.0, ease + 0.1);
   }
   card.due = Date.now() + card.interval * 86400000;
   return card;
@@ -1212,303 +1301,492 @@ function srsUpdate(card, quality){
 /* =====================================================================
    5. STATE
    ===================================================================== */
-const STORE_KEY = "Japanese-lab-jlpt-v1";
-let state = {
-  completed: {},         // word key -> true
-  srs: {},               // word key -> SRS card
+const STORE_KEY = "kotoba-lab-jlpt-v1";
+const LEGACY_KEY = "sakura-lab-jlpt-v1";
+const PERSISTED = ["completed", "srs", "quizScore", "quizTotal", "theme",
+                   "currentLevel", "currentTopic", "srsMode", "srsLevel", "srsTopic"];
+const state = {
+  completed: {},          // word key -> true
+  srs: {},                // word key -> SRS card
   quizScore: 0,
   quizTotal: 0,
-  theme: "dark",
+  theme: null,            // null = follow the system until the user picks one
   currentLevel: "all",
   currentTopic: "all",
   currentVocabPage: 1,
-  quizSet: [],
+  currentGrammarPage: 1,
   quizAnswers: {},
-  srsQueue: [],
-  srsIndex: 0,
   srsMode: "jp-en",
   srsLevel: "all",
   srsTopic: "all"
 };
 const $ = id => document.getElementById(id);
+const expandedVocab = new Set();
+
+/* Incremental counters — avoid re-walking the whole library on every save. */
+let completedCount = 0;
+
+function recomputeCompletedCount(){
+  let n = 0;
+  for(const k in state.completed) if(vocabByKey.has(k)) n++;
+  completedCount = n;
+}
+
+/* Copy only valid, known fields from untrusted data (storage or an imported file). */
+function applySaved(src){
+  if(!src || typeof src !== "object") return;
+  if(src.completed && typeof src.completed === "object"){
+    state.completed = {};
+    for(const k in src.completed) if(src.completed[k] && vocabByKey.has(k)) state.completed[k] = true;
+  }
+  if(src.srs && typeof src.srs === "object"){
+    state.srs = {};
+    for(const k in src.srs){
+      const c = src.srs[k];
+      if(c && typeof c === "object" && vocabByKey.has(k)){
+        state.srs[k] = {ease: +c.ease || 2.5, interval: +c.interval || 0, repetitions: +c.repetitions || 0, due: +c.due || 0};
+      }
+    }
+  }
+  if(Number.isFinite(src.quizScore) && src.quizScore >= 0) state.quizScore = Math.floor(src.quizScore);
+  if(Number.isFinite(src.quizTotal) && src.quizTotal >= 0) state.quizTotal = Math.floor(src.quizTotal);
+  if(src.theme === "light" || src.theme === "dark") state.theme = src.theme;
+  if(LEVELS.includes(src.currentLevel)) state.currentLevel = src.currentLevel;
+  if(TOPIC_IDS.includes(src.currentTopic)) state.currentTopic = src.currentTopic;
+  if(["jp-en", "en-jp"].includes(src.srsMode)) state.srsMode = src.srsMode;
+  if(LEVELS.includes(src.srsLevel)) state.srsLevel = src.srsLevel;
+  if(TOPIC_IDS.includes(src.srsTopic)) state.srsTopic = src.srsTopic;
+  recomputeCompletedCount();
+}
 
 function loadState(){
-  try{
-    const raw = localStorage.getItem(STORE_KEY);
-    if(!raw) return;
-    const s = JSON.parse(raw);
-    if(!s || typeof s !== "object") return;
-    state = {...state, ...s};
-  }catch(e){}
-  if(!state.completed || typeof state.completed !== "object") state.completed = {};
-  if(!state.srs || typeof state.srs !== "object") state.srs = {};
-  if(!state.quizAnswers || typeof state.quizAnswers !== "object") state.quizAnswers = {};
-  if(!["dark","light"].includes(state.theme)) state.theme = "dark";
-  if(typeof state.quizScore !== "number") state.quizScore = 0;
-  if(typeof state.quizTotal !== "number") state.quizTotal = 0;
-  if(typeof state.currentVocabPage !== "number") state.currentVocabPage = 1;
+  // New key first, then the legacy "sakura-lab-jlpt-v1" key for existing users.
+  let raw = null;
+  try{ raw = localStorage.getItem(STORE_KEY); }catch(e){}
+  if(!raw){ try{ raw = localStorage.getItem(LEGACY_KEY); }catch(e){} }
+  if(!raw) return;
+  try{ applySaved(JSON.parse(raw)); }catch(e){}
 }
 function saveState(){
-  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); $("saveState").textContent = "Saved locally"; }catch(e){ $("saveState").textContent = "Storage unavailable"; }
-  updateProgressUI();
+  const out = {};
+  PERSISTED.forEach(k => { out[k] = state[k]; });
+  try{
+    localStorage.setItem(STORE_KEY, JSON.stringify(out));
+    $("saveState").textContent = "Saved locally";
+  }catch(e){
+    $("saveState").textContent = "Storage unavailable";
+  }
+  scheduleProgressUI();
+}
+
+/* Coalesce dashboard repaints — rapid SRS ratings / quiz answers become one paint. */
+let _progressQueued = false;
+function scheduleProgressUI(){
+  if(_progressQueued) return;
+  _progressQueued = true;
+  requestAnimationFrame(() => { _progressQueued = false; updateProgressUI(); });
 }
 
 /* =====================================================================
    6. HELPERS
    ===================================================================== */
-function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c])); }
 function toast(msg){ const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 2200); }
-function debounce(fn, ms=140){ let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
-function vocabKey(w){ return w[0] + "|" + w[1]; }
+function debounce(fn, ms = 140){ let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
 function shuffle(arr){ const a = arr.slice(); for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+function countDone(){ return completedCount; }
+function countDue(){ const now = Date.now(); let n = 0; for(const k in state.srs) if(vocabByKey.has(k) && state.srs[k].due <= now) n++; return n; }
 
 /* =====================================================================
-   7. VIEW SWITCHING
+   7. THEME  (light / dark, remembered; follows the system until chosen)
    ===================================================================== */
+const systemLight = window.matchMedia ? window.matchMedia("(prefers-color-scheme: light)") : null;
+function activeTheme(){ return state.theme || (systemLight && systemLight.matches ? "light" : "dark"); }
+
+function applyTheme(){
+  const t = activeTheme();
+  document.documentElement.setAttribute("data-theme", t);
+  document.querySelectorAll("[data-theme-choice]").forEach(b => {
+    b.setAttribute("aria-pressed", String(b.dataset.themeChoice === t));
+  });
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute("content", t === "light" ? "#f5f4ed" : "#1b1a19");
+}
+
+/* =====================================================================
+   8. VIEW SWITCHING  (with lazy rendering)
+   ===================================================================== */
+let currentView = "dashboard";
+const renderedViews = new Set();
+
+/* Render a view's content the first time it is opened. */
+function ensureView(name){
+  if(renderedViews.has(name)) return;
+  renderedViews.add(name);
+  if(name === "vocab")           renderVocab();
+  else if(name === "grammar")    renderGrammar();
+  else if(name === "mnemonics")  renderMnemonicGrid();
+  else if(name === "practice" && !currentQuiz.length) renderQuiz();
+}
+
 function goView(name){
+  if(!VIEWS.includes(name)) return;
+  currentView = name;
   document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-  const view = $("view-" + name);
-  if(view) view.classList.add("active");
+  $("view-" + name).classList.add("active");
   document.querySelectorAll(".navtab").forEach(t => {
     const active = t.dataset.view === name;
     t.classList.toggle("active", active);
-    t.setAttribute("aria-selected", String(active));
+    if(active) t.setAttribute("aria-current", "page"); else t.removeAttribute("aria-current");
   });
-  $("sidebar").classList.remove("open");
-  $("mobileMenu").setAttribute("aria-expanded", "false");
-  if(name === "vocab") renderVocab();
-  if(name === "grammar") renderGrammar();
-  if(name === "mnemonics") renderMnemonicGrid();
+  closeSidebar();
+  ensureView(name);
   window.scrollTo(0, 0);
 }
+function closeSidebar(){ $("sidebar").classList.remove("open"); $("mobileMenu").setAttribute("aria-expanded", "false"); }
 
 /* =====================================================================
-   8. DASHBOARD
+   9. DASHBOARD
    ===================================================================== */
 function updateProgressUI(){
   const total = vocabulary.length;
-  const done = Object.keys(state.completed).length;
+  const done = countDone();
+  const due = countDue();
   const pct = total ? Math.round(done / total * 100) : 0;
-  if($("dashVocab")) $("dashVocab").textContent = vocabulary.length;
-  if($("dashGrammar")) $("dashGrammar").textContent = grammar.length;
-  if($("dashDone")) $("dashDone").textContent = done + " / " + total;
-  if($("dashScore")) $("dashScore").textContent = state.quizScore + " / " + state.quizTotal;
-  if($("progressPct")) $("progressPct").textContent = pct + "%";
-  if($("progressBar")) $("progressBar").style.width = pct + "%";
-  if($("progressTrack")) $("progressTrack").setAttribute("aria-valuenow", String(pct));
-  if($("progressLabel")) $("progressLabel").textContent = done === 0 ? "Start with the Vocabulary tab to begin learning N5 words." : done + " words mastered. " + (total - done) + " remain.";
-  if($("vocabCount")) $("vocabCount").textContent = vocabulary.length + " words";
-  if($("grammarCount")) $("grammarCount").textContent = grammar.length + " grammar";
+  $("dashVocab").textContent = total;
+  $("dashGrammar").textContent = grammar.length;
+  $("dashDone").textContent = done + " / " + total;
+  $("dashScore").textContent = state.quizScore + " / " + state.quizTotal;
+  $("progressPct").textContent = pct + "%";
+  $("progressBar").style.width = pct + "%";
+  $("progressTrack").setAttribute("aria-valuenow", String(pct));
+  $("progressLabel").textContent = done === 0
+    ? "Start with the Vocabulary tab to begin learning words."
+    : done + " words learned · " + (total - done) + " to go" + (due ? " · " + due + " flashcard" + (due === 1 ? "" : "s") + " due for review" : "");
+  $("vocabCount").textContent = total + " words";
+  $("grammarCount").textContent = grammar.length + " grammar";
 }
 
 /* =====================================================================
-   9. VOCABULARY RENDERER
+   10. FILTERS (level + topic are shared by sidebar, vocab and grammar)
+   ===================================================================== */
+const _topicCounts = {};
+
+function topicCountsFor(level){
+  if(_topicCounts[level]) return _topicCounts[level];
+  const counts = {all: 0};
+  for(const w of vocabulary){
+    if(level === "all" || w[3] === level){
+      counts.all++;
+      counts[w[4]] = (counts[w[4]] || 0) + 1;
+    }
+  }
+  _topicCounts[level] = counts;
+  return counts;
+}
+
+function renderTopicFilters(){
+  const counts = topicCountsFor(state.currentLevel);
+  const on = id => id === state.currentTopic;
+  $("sideTopics").innerHTML = TOPICS.map(([id, label]) =>
+    `<button type="button" class="side-item${on(id) ? " active" : ""}" data-topic="${id}" aria-pressed="${on(id)}"><span>${label}</span><span class="count">${counts[id] || 0}</span></button>`
+  ).join("");
+  $("vocabTopicFilters").innerHTML = TOPICS.map(([id, label]) =>
+    `<button type="button" class="filter-btn${on(id) ? " active" : ""}" data-topic="${id}" aria-pressed="${on(id)}">${label}</button>`
+  ).join("");
+}
+
+function syncFilterUI(){
+  document.querySelectorAll("[data-level]").forEach(b => {
+    const on = b.dataset.level === state.currentLevel;
+    b.classList.toggle("active", on);
+    b.setAttribute("aria-pressed", String(on));
+  });
+  renderTopicFilters();
+}
+
+function setLevel(level){
+  if(!LEVELS.includes(level)) return;
+  state.currentLevel = level;
+  state.currentVocabPage = 1;
+  state.currentGrammarPage = 1;
+  saveState();
+  syncFilterUI();
+  // Re-render only the view that is actually on screen.
+  if(currentView === "vocab"){ renderVocab(); closeSidebar(); }
+  else if(currentView === "grammar"){ renderGrammar(); closeSidebar(); }
+  else goView("vocab");
+}
+
+function setTopic(topic){
+  if(!TOPIC_IDS.includes(topic)) return;
+  state.currentTopic = topic;
+  state.currentVocabPage = 1;
+  state.currentGrammarPage = 1;
+  saveState();
+  syncFilterUI();
+  if(currentView === "vocab"){ renderVocab(); closeSidebar(); }
+  else if(currentView === "grammar"){ renderGrammar(); closeSidebar(); }
+  else goView("vocab");
+}
+
+/* =====================================================================
+   11. VOCABULARY RENDERER
    ===================================================================== */
 const VOCAB_PAGE_SIZE = 60;
 let vocabFilterText = "";
 
 function getFilteredVocab(){
-  const q = vocabFilterText.toLowerCase();
-  const level = state.currentLevel;
-  const topic = state.currentTopic;
+  const q = vocabFilterText.trim().toLowerCase();
   return vocabulary.filter(w => {
-    if(level !== "all" && w[3] !== level) return false;
-    if(topic !== "all" && w[4] !== topic) return false;
+    if(state.currentLevel !== "all" && w[3] !== state.currentLevel) return false;
+    if(state.currentTopic !== "all" && w[4] !== state.currentTopic) return false;
     if(q && !(w[0] + " " + w[1] + " " + w[2]).toLowerCase().includes(q)) return false;
     return true;
   });
+}
+
+function vocabCardHTML(w){
+  const key = vocabKey(w);
+  const done = !!state.completed[key];
+  const open = expandedVocab.has(key);
+  return `<div class="vocab-card${done ? " learned" : ""}${open ? " expanded" : ""}" data-key="${esc(key)}" tabindex="0" aria-expanded="${open}">
+    <span class="level-tag level-${w[3]}">${w[3].toUpperCase()}</span>
+    <div class="jp" lang="ja">${esc(w[0])}${done ? ' <span class="tick" aria-label="Learned">✓</span>' : ""}</div>
+    ${w[1] !== w[0] ? `<div class="kana" lang="ja">${esc(w[1])}</div>` : ""}
+    <div class="en">${esc(w[2])}</div>
+    <div class="meta"><span class="chip">${esc(w[4])}</span><button type="button" class="btn small" data-mark="${esc(key)}">${done ? "✓ Learned" : "Mark learned"}</button></div>
+    <div class="mnemonic mnemonic-note">💡 ${esc(w[5])}</div>
+  </div>`;
 }
 
 function renderVocab(){
   const filtered = getFilteredVocab();
   const shown = filtered.slice(0, state.currentVocabPage * VOCAB_PAGE_SIZE);
   $("vocabShown").textContent = `Showing ${shown.length} of ${filtered.length} words`;
-  $("vocabList").innerHTML = shown.map((w, i) => {
-    const key = vocabKey(w);
-    const done = state.completed[key];
-    return `<div class="vocab-card" data-vocab-index="${i}" data-key="${esc(key)}">
-      <span class="level-tag level-${w[3]}">${w[3].toUpperCase()}</span>
-      <div class="jp">${esc(w[0])} ${done ? '<span style="color:var(--green);font-size:13px">✓</span>' : ''}</div>
-      <div class="kana">${esc(w[1])}</div>
-      <div class="en">${esc(w[2])}</div>
-      <div class="meta"><span class="chip">${esc(w[4])}</span><button type="button" class="btn small" data-mark="${esc(key)}">${done ? "✓ Learned" : "Mark learned"}</button></div>
-      <div class="mnemonic">💡 ${esc(w[5])}</div>
-    </div>`;
-  }).join("");
-  if(!shown.length) $("vocabList").innerHTML = '<div class="empty">No words match your search.</div>';
+  $("vocabList").innerHTML = shown.length ? shown.map(vocabCardHTML).join("") : '<div class="empty">No words match your search.</div>';
   $("loadMoreVocab").style.display = shown.length < filtered.length ? "inline-flex" : "none";
 }
 
+function toggleVocabCard(card){
+  const key = card.dataset.key;
+  const open = !expandedVocab.has(key);
+  if(open) expandedVocab.add(key); else expandedVocab.delete(key);
+  card.classList.toggle("expanded", open);
+  card.setAttribute("aria-expanded", String(open));
+}
+
 function bindVocabEvents(){
-  $("vocabList").addEventListener("click", e => {
+  const list = $("vocabList");
+  list.addEventListener("click", e => {
     const markBtn = e.target.closest("[data-mark]");
     if(markBtn){
-      e.stopPropagation();
       const key = markBtn.dataset.mark;
-      state.completed[key] = !state.completed[key];
+      if(state.completed[key]){ delete state.completed[key]; completedCount--; }
+      else { state.completed[key] = true; completedCount++; }
       saveState();
-      renderVocab();
+      // refresh just this card so the list keeps its scroll position and expanded state
+      const card = markBtn.closest(".vocab-card");
+      const w = vocabByKey.get(key);
+      if(card && w){
+        card.outerHTML = vocabCardHTML(w);
+        const fresh = list.querySelector(`[data-key="${CSS.escape(key)}"] [data-mark]`);
+        if(fresh) fresh.focus();
+      }
       return;
     }
     const card = e.target.closest(".vocab-card");
-    if(card) card.classList.toggle("expanded");
+    if(card) toggleVocabCard(card);
   });
-  $("loadMoreVocab").addEventListener("click", () => { state.currentVocabPage++; saveState(); renderVocab(); });
-  $("vocabSearch").addEventListener("input", debounce(e => { vocabFilterText = e.target.value; state.currentVocabPage = 1; renderVocab(); }, 140));
-  document.querySelectorAll("[data-vlevel]").forEach(b => b.addEventListener("click", () => {
-    document.querySelectorAll("[data-vlevel]").forEach(x => x.classList.remove("active"));
-    b.classList.add("active");
-    state.currentLevel = b.dataset.vlevel;
+  list.addEventListener("keydown", e => {
+    if((e.key === "Enter" || e.key === " ") && e.target.classList.contains("vocab-card")){
+      e.preventDefault();
+      toggleVocabCard(e.target);
+    }
+  });
+  $("loadMoreVocab").addEventListener("click", () => { state.currentVocabPage++; renderVocab(); });
+  $("vocabSearch").addEventListener("input", debounce(e => {
+    vocabFilterText = e.target.value;
     state.currentVocabPage = 1;
-    saveState();
     renderVocab();
-  }));
-  document.querySelectorAll("[data-vtopic]").forEach(b => b.addEventListener("click", () => {
-    document.querySelectorAll("[data-vtopic]").forEach(x => x.classList.remove("active"));
-    b.classList.add("active");
-    state.currentTopic = b.dataset.vtopic;
-    state.currentVocabPage = 1;
-    saveState();
-    renderVocab();
-  }));
+  }, 140));
 }
 
 /* =====================================================================
-   10. GRAMMAR RENDERER
+   12. GRAMMAR RENDERER  (paginated)
    ===================================================================== */
+const GRAMMAR_PAGE_SIZE = 40;
+
+function grammarCardHTML(g){
+  return `<div class="grammar-card" tabindex="0" aria-expanded="false">
+    <div><span class="pattern" lang="ja">${esc(g.pattern)}</span><span class="level-tag level-${g.level}">${g.level.toUpperCase()}</span></div>
+    <div class="meaning">${esc(g.meaning)}</div>
+    <div class="structure" lang="ja">${esc(g.structure)}</div>
+    <div class="example-jp" lang="ja">${esc(g.exampleJp)}</div>
+    <div class="example-en">${esc(g.exampleEn)}</div>
+    <div class="mnemonic-note">💡 ${esc(g.mnemonic)}</div>
+    <div class="foot"><span class="chip">${esc(g.topic)}</span></div>
+  </div>`;
+}
+
 function renderGrammar(){
-  const q = ($("grammarSearch").value || "").toLowerCase();
-  const level = state.grammarLevel || "all";
+  const q = ($("grammarSearch").value || "").trim().toLowerCase();
   const filtered = grammar.filter(g => {
-    if(level !== "all" && g.level !== level) return false;
-    if(q && !(g.pattern + " " + g.meaning + " " + g.exampleJp + " " + g.exampleEn).toLowerCase().includes(q)) return false;
+    if(state.currentLevel !== "all" && g.level !== state.currentLevel) return false;
+    if(q && !(g.pattern + " " + g.meaning + " " + g.structure + " " + g.exampleJp + " " + g.exampleEn + " " + g.topic).toLowerCase().includes(q)) return false;
     return true;
   });
-  $("grammarShown").textContent = `${filtered.length} of ${grammar.length} patterns`;
-  $("grammarList").innerHTML = filtered.map((g, i) => `
-    <div class="grammar-card" data-gindex="${i}">
-      <span class="level-tag level-${g.level}">${g.level.toUpperCase()}</span>
-      <div class="pattern">${esc(g.pattern)}</div>
-      <div class="meaning">${esc(g.meaning)}</div>
-      <div class="structure">${esc(g.structure)}</div>
-      <div class="example-jp">${esc(g.exampleJp)}</div>
-      <div class="example-en">${esc(g.exampleEn)}</div>
-      <div class="mnemonic">💡 ${esc(g.mnemonic)}</div>
-      <div style="margin-top:6px"><span class="chip">${esc(g.topic)}</span></div>
-    </div>
-  `).join("");
-  if(!filtered.length) $("grammarList").innerHTML = '<div class="empty">No grammar patterns match your search.</div>';
+  const shown = filtered.slice(0, state.currentGrammarPage * GRAMMAR_PAGE_SIZE);
+  $("grammarShown").textContent = `Showing ${shown.length} of ${filtered.length} patterns`;
+  $("grammarList").innerHTML = shown.length ? shown.map(grammarCardHTML).join("")
+    : '<div class="empty">No grammar patterns match your search.</div>';
+  $("loadMoreGrammar").style.display = shown.length < filtered.length ? "inline-flex" : "none";
+}
+
+function toggleGrammarCard(card){
+  const open = !card.classList.contains("expanded");
+  card.classList.toggle("expanded", open);
+  card.setAttribute("aria-expanded", String(open));
 }
 
 function bindGrammarEvents(){
-  $("grammarSearch").addEventListener("input", debounce(renderGrammar, 140));
-  document.querySelectorAll("[data-glevel]").forEach(b => b.addEventListener("click", () => {
-    document.querySelectorAll("[data-glevel]").forEach(x => x.classList.remove("active"));
-    b.classList.add("active");
-    state.grammarLevel = b.dataset.glevel;
+  $("grammarSearch").addEventListener("input", debounce(() => {
+    state.currentGrammarPage = 1;
     renderGrammar();
-  }));
+  }, 140));
+  $("loadMoreGrammar").addEventListener("click", () => { state.currentGrammarPage++; renderGrammar(); });
   $("grammarList").addEventListener("click", e => {
     const card = e.target.closest(".grammar-card");
-    if(card) card.classList.toggle("expanded");
+    if(card) toggleGrammarCard(card);
+  });
+  $("grammarList").addEventListener("keydown", e => {
+    if((e.key === "Enter" || e.key === " ") && e.target.classList.contains("grammar-card")){
+      e.preventDefault();
+      toggleGrammarCard(e.target);
+    }
   });
 }
 
 /* =====================================================================
-   11. QUIZ ENGINE
+   13. QUIZ ENGINE
    ===================================================================== */
 let currentQuiz = [];
+
+/* One correct answer + up to three distinct wrong ones, shuffled. */
+function buildOptions(correct, candidates){
+  const out = [correct];
+  for(const c of candidates){
+    if(out.length >= 4) break;
+    if(!out.includes(c)) out.push(c);
+  }
+  return shuffle(out);
+}
+
+function vocabQuestion(w, kind, pool){
+  // Prefer distractors of the same word type, then fall back to the rest of the pool.
+  const others = pool.filter(x => x !== w);
+  const ranked = [...shuffle(others.filter(x => x[4] === w[4])), ...shuffle(others.filter(x => x[4] !== w[4]))];
+  const jp = w[0] !== w[1] ? ` (${w[1]})` : "";
+  if(kind === "reading"){
+    return {
+      question: `How do you read 「${w[0]}」?`,
+      options: buildOptions(w[1], ranked.map(x => x[1])),
+      correct: w[1], detail: `${w[0]} is read ${w[1]} — ${w[2]}`, mnemonic: w[5]
+    };
+  }
+  if(kind === "reverse"){
+    return {
+      question: `Which Japanese word means "${w[2]}"?`,
+      options: buildOptions(w[0], ranked.map(x => x[0])),
+      correct: w[0], detail: `${w[0]} (${w[1]}) — ${w[2]}`, mnemonic: w[5]
+    };
+  }
+  return {
+    question: `What does 「${w[0]}」${jp} mean?`,
+    options: buildOptions(w[2], ranked.map(x => x[2])),
+    correct: w[2], detail: `${w[0]} (${w[1]}) — ${w[2]}`, mnemonic: w[5]
+  };
+}
+
+function grammarQuestion(g, pool){
+  // Skip entries that share the same pattern so near-identical answers never appear together.
+  const ranked = shuffle(pool.filter(x => x.pattern !== g.pattern)).map(x => x.meaning);
+  return {
+    question: `What does "${g.pattern}" mean?`,
+    options: buildOptions(g.meaning, ranked),
+    correct: g.meaning, detail: g.exampleJp + " — " + g.exampleEn, mnemonic: g.mnemonic
+  };
+}
 
 function generateQuiz(){
   const type = $("quizType").value;
   const level = $("quizLevel").value;
   const count = parseInt($("quizCount").value, 10) || 20;
+  const vPool = vocabulary.filter(w => level === "all" || w[3] === level);
+  const gPool = grammar.filter(g => level === "all" || g.level === level);
+  let qs;
 
-  let pool = vocabulary.filter(w => level === "all" || w[3] === level);
   if(type === "grammar"){
-    const gPool = grammar.filter(g => level === "all" || g.level === level);
-    const questions = shuffle(gPool).slice(0, count).map(g => {
-      const wrong = shuffle(gPool.filter(x => x !== g)).slice(0, 3);
-      return {
-        type: "grammar",
-        question: `What does "${g.pattern}" mean?`,
-        options: shuffle([g.meaning, ...wrong.map(w => w.meaning)]).slice(0, 4),
-        correct: g.meaning,
-        detail: g.exampleJp + " — " + g.exampleEn,
-        mnemonic: g.mnemonic
-      };
+    qs = shuffle(gPool).slice(0, count).map(g => grammarQuestion(g, gPool));
+  }else if(type === "mixed"){
+    const gCount = Math.min(gPool.length, Math.round(count * 0.3));
+    const vCount = count - gCount;
+    const vqs = shuffle(vPool).slice(0, vCount).map(w => {
+      let kind = pick(["meaning", "reading", "reverse"]);
+      if(kind === "reading" && w[0] === w[1]) kind = "meaning";   // kana-only words have no kanji to read
+      return vocabQuestion(w, kind, vPool);
     });
-    currentQuiz = questions;
-    renderQuiz();
-    return;
+    const gqs = shuffle(gPool).slice(0, gCount).map(g => grammarQuestion(g, gPool));
+    qs = shuffle([...vqs, ...gqs]);
+  }else{
+    const source = type === "reading" ? vPool.filter(w => w[0] !== w[1]) : vPool;
+    qs = shuffle(source).slice(0, count).map(w => vocabQuestion(w, type, vPool));
   }
 
-  const questions = shuffle(pool).slice(0, count).map(w => {
-    const wrong = shuffle(vocabulary.filter(x => x[3] === w[3] && x !== w)).slice(0, 3);
-    if(type === "meaning" || type === "mixed"){
-      return {
-        type: "meaning",
-        question: `What does 「${w[0]}」(${w[1]}) mean?`,
-        options: shuffle([w[2], ...wrong.map(x => x[2])]).slice(0, 4),
-        correct: w[2],
-        detail: `${w[0]} (${w[1]}) — ${w[2]}`,
-        mnemonic: w[5]
-      };
-    }
-    if(type === "reading"){
-      return {
-        type: "reading",
-        question: `How do you read 「${w[0]}」?`,
-        options: shuffle([w[1], ...wrong.map(x => x[1])]).slice(0, 4),
-        correct: w[1],
-        detail: `${w[0]} is read ${w[1]} — ${w[2]}`,
-        mnemonic: w[5]
-      };
-    }
-    if(type === "reverse"){
-      return {
-        type: "reverse",
-        question: `Which Japanese word means "${w[2]}"?`,
-        options: shuffle([w[0], ...wrong.map(x => x[0])]).slice(0, 4),
-        correct: w[0],
-        detail: `${w[0]} (${w[1]}) — ${w[2]}`,
-        mnemonic: w[5]
-      };
-    }
-    return {type: "meaning", question: `What does 「${w[0]}」mean?`, options: shuffle([w[2], ...wrong.map(x => x[2])]).slice(0, 4), correct: w[2], detail: `${w[0]} (${w[1]}) — ${w[2]}`, mnemonic: w[5]};
-  });
-
-  // If mixed, add some grammar questions
-  if(type === "mixed"){
-    const gPool = grammar.filter(g => level === "all" || g.level === level);
-    const gQs = shuffle(gPool).slice(0, Math.max(1, Math.round(count * 0.3))).map(g => {
-      const wrong = shuffle(gPool.filter(x => x !== g)).slice(0, 3);
-      return {
-        type: "grammar",
-        question: `What does "${g.pattern}" mean?`,
-        options: shuffle([g.meaning, ...wrong.map(w => w.meaning)]).slice(0, 4),
-        correct: g.meaning,
-        detail: g.exampleJp + " — " + g.exampleEn,
-        mnemonic: g.mnemonic
-      };
-    });
-    currentQuiz = shuffle([...questions, ...gQs]).slice(0, count);
-  } else {
-    currentQuiz = questions;
-  }
+  state.quizAnswers = {};
+  currentQuiz = qs;
+  renderedViews.add("practice");
   renderQuiz();
 }
 
+function quizTally(){
+  const answers = Object.values(state.quizAnswers);
+  return {answered: answers.length, correct: answers.filter(a => a.correct).length};
+}
+
+function updateQuizScore(){
+  const {answered, correct} = quizTally();
+  $("practiceScore").textContent = `Score: ${correct} / ${answered}` + (currentQuiz.length ? ` · ${currentQuiz.length} questions` : "");
+}
+
+function feedbackHTML(q, ok){
+  return `<b>${ok ? "✓ Correct." : "✗ Not quite."}</b><div class="jp" lang="ja">${esc(q.detail)}</div>${q.mnemonic ? `<div class="mnemonic-note">💡 ${esc(q.mnemonic)}</div>` : ""}`;
+}
+
+function quizSummaryHTML(){
+  const {answered, correct} = quizTally();
+  if(!currentQuiz.length || answered < currentQuiz.length) return "";
+  const pct = Math.round(correct / answered * 100);
+  return `<div class="card" id="quizSummary">
+    <div class="eyebrow">Quiz complete</div>
+    <h2>${correct} / ${answered} correct (${pct}%)</h2>
+    <p class="small muted" style="margin:0 0 12px">${pct >= 80 ? "Excellent work — keep the streak going." : pct >= 50 ? "Solid progress. Review the mnemonics for the ones you missed." : "Every miss is a chance to learn — try the flashcards, then retake the quiz."}</p>
+    <div class="btn-row"><button type="button" class="btn primary" id="quizAgain">New quiz</button></div>
+  </div>`;
+}
+
 function renderQuiz(){
-  if(!currentQuiz.length){ $("quizArea").innerHTML = '<div class="empty">Generate a quiz to begin.</div>'; return; }
-  const answered = Object.keys(state.quizAnswers).length;
-  const correct = Object.values(state.quizAnswers).filter(x => x.correct).length;
-  $("practiceScore").textContent = `Score: ${correct} / ${answered}`;
+  if(!currentQuiz.length){
+    $("quizArea").innerHTML = '<div class="card empty">Pick your settings above and press <strong>Generate quiz</strong>.</div>';
+    updateQuizScore();
+    return;
+  }
   $("quizArea").innerHTML = currentQuiz.map((q, i) => {
     const saved = state.quizAnswers[i];
     return `<div class="card" data-qindex="${i}">
       <div class="eyebrow">Question ${i + 1} of ${currentQuiz.length}</div>
-      <h3 style="margin:6px 0 10px">${esc(q.question)}</h3>
+      <h3 style="margin:6px 0 10px;font-size:16px" lang="ja">${esc(q.question)}</h3>
       <div>${q.options.map((o, oi) => {
         let cls = "quiz-option";
         if(saved){
@@ -1517,19 +1795,15 @@ function renderQuiz(){
         }
         return `<button type="button" class="${cls}" data-qi="${i}" data-oi="${oi}" ${saved ? "disabled" : ""}>${String.fromCharCode(65 + oi)}. ${esc(o)}</button>`;
       }).join("")}</div>
-      <div class="quiz-feedback${saved ? " show" : ""}" id="qfb-${i}">
-        ${saved ? `<b>${saved.correct ? "✓ Correct." : "✗ Not quite."}</b><div class="jp">${esc(q.detail)}</div>${q.mnemonic ? `<div style="margin-top:6px;color:var(--purple)">💡 ${esc(q.mnemonic)}</div>` : ""}` : ""}
-      </div>
+      <div class="quiz-feedback${saved ? " show" : ""}" id="qfb-${i}">${saved ? feedbackHTML(q, saved.correct) : ""}</div>
     </div>`;
-  }).join("");
-  $("quizArea").querySelectorAll("[data-qi]").forEach(b => {
-    if(b.disabled) return;
-    b.addEventListener("click", () => answerQuiz(+b.dataset.qi, +b.dataset.oi));
-  });
+  }).join("") + quizSummaryHTML();
+  updateQuizScore();
 }
 
 function answerQuiz(qi, oi){
   const q = currentQuiz[qi];
+  if(!q || state.quizAnswers[qi]) return;
   const box = document.querySelector(`[data-qindex="${qi}"]`);
   box.querySelectorAll(".quiz-option").forEach(b => {
     b.disabled = true;
@@ -1538,112 +1812,121 @@ function answerQuiz(qi, oi){
     else if(c === oi) b.classList.add("wrong");
   });
   const choice = q.options[oi];
-  const correct = choice === q.correct;
-  state.quizAnswers[qi] = {choice, correct};
+  const ok = choice === q.correct;
+  state.quizAnswers[qi] = {choice, correct: ok};
   state.quizTotal++;
-  if(correct) state.quizScore++;
+  if(ok) state.quizScore++;
   saveState();
   const fb = $(`qfb-${qi}`);
   fb.classList.add("show");
-  fb.innerHTML = `<b>${correct ? "✓ Correct." : "✗ Not quite."}</b><div class="jp">${esc(q.detail)}</div>${q.mnemonic ? `<div style="margin-top:6px;color:var(--purple)">💡 ${esc(q.mnemonic)}</div>` : ""}`;
-  const answered = Object.keys(state.quizAnswers).length;
-  const corr = Object.values(state.quizAnswers).filter(x => x.correct).length;
-  $("practiceScore").textContent = `Score: ${corr} / ${answered}`;
+  fb.innerHTML = feedbackHTML(q, ok);
+  updateQuizScore();
+  const summary = quizSummaryHTML();
+  if(summary && !$("quizSummary")){
+    $("quizArea").insertAdjacentHTML("beforeend", summary);
+    const t = quizTally();
+    toast(`Quiz complete — ${t.correct} / ${t.answered}`);
+  }
 }
 
 function bindQuizEvents(){
-  $("startQuiz").addEventListener("click", () => { state.quizAnswers = {}; generateQuiz(); });
+  $("startQuiz").addEventListener("click", generateQuiz);
   $("clearQuiz").addEventListener("click", () => { currentQuiz = []; state.quizAnswers = {}; renderQuiz(); });
+  $("quizArea").addEventListener("click", e => {
+    const opt = e.target.closest(".quiz-option");
+    if(opt && !opt.disabled){ answerQuiz(+opt.dataset.qi, +opt.dataset.oi); return; }
+    if(e.target.closest("#quizAgain")){ generateQuiz(); window.scrollTo({top: 0}); }
+  });
 }
 
 /* =====================================================================
-   12. FLASHCARD / SRS ENGINE
+   14. FLASHCARD / SRS ENGINE
    ===================================================================== */
 let srsDeck = [];
-let srsCurrent = null;
+let srsCurrent = 0;
 
 function buildSrsQueue(){
   const level = $("srsLevel").value;
   const topic = $("srsTopic").value;
-  const mode = $("srsMode").value;
-  state.srsMode = mode;
+  state.srsMode = $("srsMode").value;
   state.srsLevel = level;
   state.srsTopic = topic;
-  let pool = vocabulary.filter(w => (level === "all" || w[3] === level) && (topic === "all" || w[4] === topic));
+  saveState();
+  const pool = vocabulary.filter(w => (level === "all" || w[3] === level) && (topic === "all" || w[4] === topic));
   const now = Date.now();
-  // Due cards first, then new cards
+  // Due cards first, then up to 20 new cards
   const due = pool.filter(w => { const c = state.srs[vocabKey(w)]; return c && c.due <= now; });
   const fresh = pool.filter(w => !state.srs[vocabKey(w)]);
   srsDeck = [...shuffle(due), ...shuffle(fresh).slice(0, 20)];
-  if(!srsDeck.length) srsDeck = shuffle(pool).slice(0, 20);
+  if(!srsDeck.length && pool.length){
+    srsDeck = shuffle(pool).slice(0, 20);
+    toast("Nothing is due — reviewing a random set");
+  }
   srsCurrent = 0;
   showSrsCard();
 }
 
+function flipCard(){ const fc = $("flashcard"); if(fc) fc.classList.toggle("flipped"); }
+
 function showSrsCard(){
-  if(!srsDeck.length || srsCurrent >= srsDeck.length){
-    $("srsArea").innerHTML = '<div class="card empty">🎉 Session complete! Come back tomorrow for your next review.<br><button type="button" class="btn primary" style="margin-top:12px" id="srsRestart">Restart session</button></div>';
-    const rb = $("srsRestart"); if(rb) rb.addEventListener("click", buildSrsQueue);
+  if(!srsDeck.length){
+    $("srsArea").innerHTML = '<div class="card empty">No cards match these settings. Try a different level or topic.</div>';
+    $("srsStatus").textContent = "Ready";
+    return;
+  }
+  if(srsCurrent >= srsDeck.length){
+    $("srsArea").innerHTML = '<div class="card empty">🎉 Session complete! Come back later for your next review.<br><button type="button" class="btn primary" style="margin-top:12px" id="srsRestart">Start another session</button></div>';
+    $("srsRestart").addEventListener("click", buildSrsQueue);
     $("srsStatus").textContent = "Complete";
     return;
   }
   const w = srsDeck[srsCurrent];
-  const key = vocabKey(w);
-  const card = state.srs[key] || {...SRS_DEFAULTS};
-  const isJpEn = state.srsMode === "jp-en";
-  const frontWord = isJpEn ? w[0] : w[2];
-  const backWord = isJpEn ? w[0] : w[2];
-  const backMeaning = isJpEn ? w[2] : w[0];
-  const backKana = w[1];
-  const knownCount = Object.keys(state.srs).length;
-
+  const jpFirst = state.srsMode === "jp-en";
   $("srsStatus").textContent = `Card ${srsCurrent + 1} / ${srsDeck.length}`;
   $("srsArea").innerHTML = `
-    <div class="card" style="text-align:center;padding:8px 0 4px">
-      <div class="tiny" style="margin-bottom:10px">${esc(w[3].toUpperCase())} · ${esc(w[4])} · SRS cards tracked: ${knownCount}</div>
+    <div class="card" style="text-align:center;padding:14px 12px 16px">
+      <div class="tiny" style="margin-bottom:10px">${esc(w[3].toUpperCase())} · ${esc(w[4])} · ${Object.keys(state.srs).length} cards tracked</div>
       <div class="flashcard-area">
-        <div class="flashcard" id="flashcard">
+        <div class="flashcard" id="flashcard" tabindex="0" role="button" aria-label="Flashcard. Press Space to flip.">
           <div class="fc-face fc-front">
-            <div class="word">${esc(frontWord)}</div>
-            <div class="hint">Tap to reveal</div>
+            <div class="word" lang="${jpFirst ? "ja" : "en"}">${esc(jpFirst ? w[0] : w[2])}</div>
+            <div class="hint">Click, tap or press Space to flip</div>
           </div>
           <div class="fc-face fc-back">
-            <div class="word">${esc(backWord)}</div>
-            <div class="kana">${esc(backKana)}</div>
-            <div class="meaning">${esc(backMeaning)}</div>
-            <div class="mnemonic">💡 ${esc(w[5])}</div>
+            <div class="word" lang="ja">${esc(w[0])}</div>
+            ${w[1] !== w[0] ? `<div class="kana" lang="ja">${esc(w[1])}</div>` : ""}
+            <div class="meaning">${esc(w[2])}</div>
+            <div class="mnemonic-note">💡 ${esc(w[5])}</div>
           </div>
         </div>
       </div>
       <div class="btn-row" style="margin-top:20px;justify-content:center">
-        <button type="button" class="btn" data-srs="0">Again</button>
-        <button type="button" class="btn" data-srs="1">Hard</button>
-        <button type="button" class="btn green" data-srs="2">Good</button>
-        <button type="button" class="btn primary" data-srs="3">Easy</button>
+        <button type="button" class="btn again" data-srs="0">Again <kbd>1</kbd></button>
+        <button type="button" class="btn" data-srs="1">Hard <kbd>2</kbd></button>
+        <button type="button" class="btn good" data-srs="2">Good <kbd>3</kbd></button>
+        <button type="button" class="btn primary" data-srs="3">Easy <kbd>4</kbd></button>
       </div>
-      <div class="tiny" style="margin-top:10px">Again = reset · Hard = shorter interval · Good = normal · Easy = longer interval</div>
+      <div class="tiny" style="margin-top:10px">Again = see it tomorrow · Hard = short step · Good = normal · Easy = longer step</div>
     </div>`;
+}
 
-  const fc = $("flashcard");
-  fc.addEventListener("click", () => fc.classList.toggle("flipped"));
-  document.querySelectorAll("[data-srs]").forEach(b => {
-    b.addEventListener("click", e => {
-      e.stopPropagation();
-      const quality = +b.dataset.srs;
-      const c = state.srs[key] || {...SRS_DEFAULTS};
-      srsUpdate(c, quality);
-      state.srs[key] = c;
-      if(quality >= 2) state.completed[key] = true;
-      saveState();
-      srsCurrent++;
-      showSrsCard();
-    });
-  });
+function rateSrs(quality){
+  const w = srsDeck[srsCurrent];
+  if(!w) return;
+  const key = vocabKey(w);
+  state.srs[key] = srsUpdate(state.srs[key] ? {...state.srs[key]} : {...SRS_DEFAULTS}, quality);
+  if(quality >= 2 && !state.completed[key]){ state.completed[key] = true; completedCount++; }
+  saveState();
+  srsCurrent++;
+  showSrsCard();
 }
 
 function bindFlashcardEvents(){
   $("startSrs").addEventListener("click", buildSrsQueue);
-  $("srsShuffle").addEventListener("click", () => { srsDeck = shuffle(srsDeck); srsCurrent = 0; showSrsCard(); });
+  $("srsShuffle").addEventListener("click", () => {
+    if(!srsDeck.length){ toast("Start a session first"); return; }
+    srsDeck = shuffle(srsDeck); srsCurrent = 0; showSrsCard();
+  });
   $("srsReset").addEventListener("click", () => {
     if(confirm("Reset all SRS progress? This cannot be undone.")){
       state.srs = {};
@@ -1651,10 +1934,16 @@ function bindFlashcardEvents(){
       toast("SRS reset");
     }
   });
+  $("srsArea").addEventListener("click", e => {
+    const rate = e.target.closest("[data-srs]");
+    if(rate){ rateSrs(+rate.dataset.srs); return; }
+    if(e.target.closest("#flashcard")) flipCard();
+  });
+  ["srsLevel", "srsTopic", "srsMode"].forEach(id => $(id).addEventListener("change", () => { state[id] = $(id).value; saveState(); }));
 }
 
 /* =====================================================================
-   13. MNEMONICS GRID
+   15. MNEMONICS GRID
    ===================================================================== */
 function renderMnemonicGrid(){
   $("mnemonicGrid").innerHTML = mnemonicTechniques.map(m => `
@@ -1667,43 +1956,29 @@ function renderMnemonicGrid(){
         </div>
       </div>
       <p class="small" style="color:var(--muted);margin:10px 0 8px;line-height:1.7">${esc(m.desc)}</p>
-      <div style="font-size:12px;color:var(--purple);background:rgba(196,168,240,.08);padding:8px 10px;border-radius:7px;border-left:2px solid var(--purple)">
-        <strong>Example:</strong> ${esc(m.example)}
-      </div>
+      <div class="mnemonic-note" style="margin-top:0"><strong>Example:</strong> ${esc(m.example)}</div>
     </div>
   `).join("");
 }
 
 /* =====================================================================
-   14. THEME
-   ===================================================================== */
-function applyTheme(){
-  document.body.dataset.theme = state.theme;
-  const btn = $("themeBtn");
-  btn.textContent = state.theme === "dark" ? "☀ Light" : "☾ Dark";
-  btn.setAttribute("aria-pressed", String(state.theme === "light"));
-  btn.setAttribute("aria-label", "Switch to " + (state.theme === "dark" ? "light" : "dark") + " mode");
-  btn.title = "Switch to " + (state.theme === "dark" ? "light" : "dark") + " mode";
-}
-
-/* =====================================================================
-   15. EXPORT / IMPORT
+   16. EXPORT / IMPORT
    ===================================================================== */
 function exportProgress(){
   const data = {
-    app: "Japanese Lab JLPT N5-N4",
+    app: "Kotoba Lab JLPT N5-N4",
     version: 1,
     exportedAt: new Date().toISOString(),
     completed: state.completed,
     srs: state.srs,
     quizScore: state.quizScore,
     quizTotal: state.quizTotal,
-    theme: state.theme
+    theme: activeTheme()
   };
   const blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = url; a.download = "Japanese-lab-progress.json";
+  a.href = url; a.download = "kotoba-lab-progress.json";
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
   toast("Progress exported");
@@ -1714,12 +1989,10 @@ function importProgress(file){
   r.onload = () => {
     try{
       const d = JSON.parse(r.result);
-      if(d.completed && typeof d.completed === "object") state.completed = d.completed;
-      if(d.srs && typeof d.srs === "object") state.srs = d.srs;
-      if(typeof d.quizScore === "number") state.quizScore = d.quizScore;
-      if(typeof d.quizTotal === "number") state.quizTotal = d.quizTotal;
-      if(["dark","light"].includes(d.theme)) state.theme = d.theme;
-      saveState(); applyTheme(); renderVocab(); updateProgressUI();
+      if(!d || typeof d !== "object") throw new Error("bad file");
+      applySaved(d);
+      saveState(); applyTheme(); syncFilterUI();
+      renderVocab(); renderGrammar();
       toast("Progress imported");
     }catch(e){ toast("Invalid progress file"); }
   };
@@ -1727,20 +2000,42 @@ function importProgress(file){
 }
 
 /* =====================================================================
-   16. INIT
+   17. INIT
    ===================================================================== */
 function init(){
   loadState();
   applyTheme();
 
-  // Tabs
+  // Topic <select> for flashcards, plus saved flashcard settings
+  $("srsTopic").innerHTML = TOPICS.map(([id, label]) => `<option value="${id}">${label}</option>`).join("");
+  $("srsLevel").value = state.srsLevel;
+  $("srsTopic").value = state.srsTopic;
+  $("srsMode").value = state.srsMode;
+
+  // Tabs + generic "go to" links
   document.querySelectorAll(".navtab").forEach(t => t.addEventListener("click", () => goView(t.dataset.view)));
   document.querySelectorAll("[data-goto]").forEach(el => el.addEventListener("click", () => goView(el.dataset.goto)));
 
-  // Theme
-  $("themeBtn").addEventListener("click", () => { state.theme = state.theme === "dark" ? "light" : "dark"; applyTheme(); saveState(); });
+  // Level / topic filters (sidebar, vocabulary and grammar share one state)
+  document.addEventListener("click", e => {
+    const lv = e.target.closest("[data-level]");
+    if(lv){ setLevel(lv.dataset.level); return; }
+    const tp = e.target.closest("[data-topic]");
+    if(tp) setTopic(tp.dataset.topic);
+  });
 
-  // Print
+  // Theme: explicit light / dark choice, remembered; follows the system until chosen
+  document.querySelectorAll("[data-theme-choice]").forEach(b => b.addEventListener("click", () => {
+    state.theme = b.dataset.themeChoice;
+    applyTheme();
+    saveState();
+  }));
+  if(systemLight){
+    const onSystemChange = () => { if(!state.theme) applyTheme(); };
+    if(systemLight.addEventListener) systemLight.addEventListener("change", onSystemChange);
+    else if(systemLight.addListener) systemLight.addListener(onSystemChange);
+  }
+
   $("printBtn").addEventListener("click", () => window.print());
 
   // Export / import
@@ -1750,21 +2045,9 @@ function init(){
 
   // Mobile menu
   $("mobileMenu").addEventListener("click", () => {
-    const sidebar = $("sidebar");
-    const open = sidebar.classList.toggle("open");
+    const open = $("sidebar").classList.toggle("open");
     $("mobileMenu").setAttribute("aria-expanded", String(open));
   });
-
-  // Sidebar level buttons
-  document.querySelectorAll("[data-level]").forEach(b => b.addEventListener("click", () => {
-    document.querySelectorAll("[data-level]").forEach(x => x.classList.remove("active"));
-    b.classList.add("active");
-    state.currentLevel = b.dataset.level;
-    state.currentVocabPage = 1;
-    saveState();
-    renderVocab();
-    renderGrammar();
-  }));
 
   // Dashboard quick buttons
   $("startVocabBtn").addEventListener("click", () => goView("vocab"));
@@ -1773,31 +2056,49 @@ function init(){
   $("resetAllBtn").addEventListener("click", () => {
     if(confirm("Reset all progress, SRS data, and quiz scores? This cannot be undone.")){
       state.completed = {}; state.srs = {}; state.quizScore = 0; state.quizTotal = 0; state.quizAnswers = {};
-      saveState(); renderVocab(); updateProgressUI(); toast("All progress reset");
+      completedCount = 0;
+      currentQuiz = []; srsDeck = []; srsCurrent = 0;
+      saveState();
+      renderedViews.add("vocab"); renderedViews.add("grammar");
+      renderVocab(); renderQuiz();
+      $("srsArea").innerHTML = '<div class="card empty">Choose your settings, then press <strong>Start / Resume</strong>.</div>';
+      $("srsStatus").textContent = "Ready";
+      toast("All progress reset");
     }
   });
 
-  // Bind sub-systems
   bindVocabEvents();
   bindGrammarEvents();
   bindQuizEvents();
   bindFlashcardEvents();
 
-  // Initial renders
-  renderVocab();
-  renderGrammar();
-  renderMnemonicGrid();
-  updateProgressUI();
+  // Light-weight first render: only the shared chrome + the dashboard.
+  syncFilterUI();
+  saveState();                 // this schedules the progress repaint on the next frame
 
   // Keyboard shortcuts
   document.addEventListener("keydown", e => {
-    const tag = document.activeElement && document.activeElement.tagName;
-    const typing = ["INPUT","TEXTAREA","SELECT"].includes(tag);
-    if(e.key === "/" && !typing){ e.preventDefault(); $("vocabSearch").focus(); }
-    if(e.key === "Escape" && document.activeElement === $("vocabSearch")){ $("vocabSearch").value = ""; vocabFilterText = ""; renderVocab(); }
-  });
+    if(e.metaKey || e.ctrlKey || e.altKey) return;
+    const el = document.activeElement;
+    const typing = !!el && ["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName);
 
-  saveState();
+    if(e.key === "/" && !typing){
+      e.preventDefault();
+      goView("vocab");
+      $("vocabSearch").focus();
+      return;
+    }
+    if(e.key === "Escape" && el === $("vocabSearch")){
+      $("vocabSearch").value = ""; vocabFilterText = ""; state.currentVocabPage = 1; renderVocab();
+      return;
+    }
+    if(currentView === "flashcards" && !typing && $("flashcard")){
+      if((e.key === " " || e.key === "Enter") && (el === document.body || el.id === "flashcard")){
+        e.preventDefault(); flipCard(); return;
+      }
+      if(["1", "2", "3", "4"].includes(e.key)){ e.preventDefault(); rateSrs(+e.key - 1); }
+    }
+  });
 }
 
 init();
